@@ -6,11 +6,16 @@ from typing import List
 from app.users.models import User
 from app.users.schemas import UserSchema, UserSignUp, UserSignIn
 
+from app.users.crud import create_user
+
 from app.core.database import SessionLocal
 from app.core.token import create_access_token
-from app.core.password import get_password_hash, verify_password
+from app.core.password import verify_password
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/users",
+    tags=["users"],
+)
 
 
 def get_db():
@@ -23,27 +28,34 @@ def get_db():
 
 @router.get("/users", response_model=List[UserSchema])
 def get_users(db: Session = Depends(get_db)):
+    """
+    Get a list of all users.
+
+    Returns:
+    - A list of users objects.
+    """
     users = db.query(User).all()
     return users
 
 
 @router.post("/signup", response_model=dict)
 def signup(user: UserSignUp, db: Session = Depends(get_db)):
+    """
+    Sign up a new user by registering it in the database.
+
+    Returns:
+    - A dictionary containing the access token and user details.
+    """
+    # Check if a user with the given email already exists
     user_in_db = db.query(User).filter(User.user_email == user.user_email).first()
     if user_in_db:
         raise HTTPException(status_code=400, detail="User email already registered")
 
-    hashed_password = get_password_hash(user.password)
+    new_user = create_user(db, user)
+    if not new_user:
+        raise HTTPException(status_code=500, detail="Failed to create user")
 
-    new_user = User(
-        user_email=user.user_email,
-        hashed_password=hashed_password,
-    )
-    db.add(new_user)
-    db.commit()
-
-    db.refresh(new_user)
-
+    # Create a JWT access token that expires in 30 minutes
     access_token_expires = timedelta(minutes=30)
     access_token = create_access_token(
         data={"sub": new_user.user_email},
@@ -52,13 +64,21 @@ def signup(user: UserSignUp, db: Session = Depends(get_db)):
 
     user_response = UserSchema.model_validate(new_user)
 
-    return {"access_token": access_token, "token_type": "bearer",
-            "user": user_response,
-            }
+    return {
+        "access_token": access_token,
+        "user": user_response,
+    }
 
 
 @router.post("/signin", response_model=dict)
 def signin(user: UserSignIn, db: Session = Depends(get_db)):
+    """
+    Sign in an existing user by verifying their email and password.
+
+    Returns:
+    - A dictionary containing the access token.
+    """
+    # Check if a user with the given email exists in the database
     user_in_db = db.query(User).filter(User.user_email == user.user_email).first()
     if not user_in_db:
         raise HTTPException(
@@ -72,10 +92,13 @@ def signin(user: UserSignIn, db: Session = Depends(get_db)):
             detail="Invalid email or password",
         )
 
+    # Create a JWT access token that expires in 30 minutes
     access_token_expires = timedelta(minutes=30)
     access_token = create_access_token(
         data={"sub": user_in_db.user_email},
         expires_delta=access_token_expires,
     )
 
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {
+        "access_token": access_token,
+    }

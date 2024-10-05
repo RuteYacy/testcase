@@ -1,18 +1,22 @@
 from fastapi import FastAPI
-from app.users import routes as users_routes
+from contextlib import asynccontextmanager
 from app.core.database import init_db
+from app.users.routes import router as user_router
 
 app = FastAPI()
 
 
-@app.on_event("startup")
-def on_startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     init_db()
+    yield
 
 
-app.include_router(users_routes.router)
+app = FastAPI(lifespan=lifespan)
+
+app.include_router(user_router)
 
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to FastAPI with PostgreSQL"}
+    return {"message": "Go to http://localhost:8000/docs"}
