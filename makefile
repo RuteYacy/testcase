@@ -5,6 +5,7 @@ run:
 down:
 	docker-compose down
 purge:
-	docker-compose down --volumes --rmi all
+	docker-compose -f docker-compose.yml down -v --rmi local
+	docker volume rm -f $$(docker volume ls -q)
 lint:
 	docker-compose run web flake8
