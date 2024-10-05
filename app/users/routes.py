@@ -10,7 +10,7 @@ from app.users.models import User
 from app.users.schemas import UserSchema, UserSignUp, UserSignIn
 from app.users.crud import create_user
 
-from app.core.database import SessionLocal
+from app.core.database import get_db
 from app.core.token import create_access_token
 from app.core.password import verify_password
 
@@ -18,14 +18,6 @@ router = APIRouter(
     prefix="/users",
     tags=["users"],
 )
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @router.get("/users", response_model=List[UserSchema])

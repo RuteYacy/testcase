@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from app.core.database import init_db
 from app.users.routes import router as user_router
+from app.emotional_data.routes import router as emotional_data_router
 
 app = FastAPI()
 
@@ -15,6 +16,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(user_router)
+app.include_router(emotional_data_router)
 
 
 @app.get("/")
