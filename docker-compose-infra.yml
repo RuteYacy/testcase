@@ -1,22 +1,6 @@
 version: '3.9'
 
 services:
-  web:
-    build: .
-    environment:
-      DATABASE_URL: postgres://cwtestcaseuser:cwtestcasepwd@db:5432/cwtestcase
-    env_file:
-      - .env
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/code
-    depends_on:
-      - db
-    command: >
-      sh -c "python app/core/management/wait_for_db.py &&
-             uvicorn app.main:app --host 0.0.0.0 --port 8000"
-
   db:
     image: postgres:13
     environment:
@@ -31,7 +15,7 @@ services:
       - "5432:5432"
 
   zookeeper:
-    image: wurstmeister/zookeeper:latest
+    image: arm64v8/zookeeper:latest
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -54,16 +38,6 @@ services:
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-
-  kafdrop:
-    image: obsidiandynamics/kafdrop
-    restart: "no"
-    environment:
-      KAFKA_BROKERCONNECT: "kafka:29092"
-    ports:
-      - 9000:9000
-    depends_on:
-      - kafka
 
 volumes:
   postgres_data:
