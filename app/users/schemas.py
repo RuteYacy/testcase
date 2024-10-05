@@ -1,15 +1,23 @@
 from pydantic import BaseModel
+from typing import Optional
 from datetime import date
 
 
 class UserSchema(BaseModel):
-    user_id: int
-    score: int
-    approved_date: date | None
-    denied_date: date | None
-    credit_limit: int | None
-    interest_rate: float | None
-    loan_term: int | None
+    user_id: Optional[int] = None
+    user_email: str
+    approved_date: Optional[date] = None
+    denied_date: Optional[date] = None
+    credit_limit: Optional[int] = None
+    interest_rate: Optional[float] = None
+    loan_term: Optional[int] = None
+    score: Optional[int] = None
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
+
+
+class UserCreate(BaseModel):
+    user_email: str
+    password: str

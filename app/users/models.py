@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Float, Date
+from sqlalchemy import Column, Integer, Float, Date, String
 from app.core.database import Base
 
 
@@ -6,9 +6,11 @@ class User(Base):
     __tablename__ = "users"
 
     user_id = Column(Integer, primary_key=True, index=True)
-    score = Column(Float, index=True)
+    user_email = Column(String)
+    hashed_password = Column(String)
+    score = Column(Float, index=True, default=0)
     approved_date = Column(Date, nullable=True)
     denied_date = Column(Date, nullable=True)
-    credit_limit = Column(Integer, nullable=False)
-    interest_rate = Column(Float, nullable=False)
-    loan_term = Column(Integer, nullable=False)
+    credit_limit = Column(Integer, nullable=True)
+    interest_rate = Column(Float, nullable=True, default=0)
+    loan_term = Column(Integer, nullable=True)
