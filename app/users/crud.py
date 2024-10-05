@@ -6,7 +6,7 @@ def get_users(db: Session):
     return db.query(models.User).all()
 
 
-def create_user(db: Session, user: schemas.UserCreate):
+def create_user(db: Session, user: schemas.UserSignUp):
     db_user = models.User(name=user.name, email=user.email)
     db.add(db_user)
     db.commit()

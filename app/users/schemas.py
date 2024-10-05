@@ -18,6 +18,11 @@ class UserSchema(BaseModel):
     }
 
 
-class UserCreate(BaseModel):
+class UserSignUp(BaseModel):
+    user_email: str
+    password: str
+
+
+class UserSignIn(BaseModel):
     user_email: str
     password: str
