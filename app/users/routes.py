@@ -44,8 +44,6 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
 
     db.refresh(new_user)
 
-    print(f"New user created with user email: {new_user.user_email}")
-
     access_token_expires = timedelta(minutes=30)
     access_token = create_access_token(
         data={"sub": new_user.user_email},
