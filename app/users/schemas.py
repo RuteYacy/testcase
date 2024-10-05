@@ -1,13 +1,14 @@
 from pydantic import BaseModel
-
-class UserCreate(BaseModel):
-    name: str
-    email: str
+from datetime import date
 
 class User(BaseModel):
-    id: int
-    name: str
-    email: str
+    user_id: int
+    score: int
+    approved_date: date | None
+    denied_date: date | None
+    credit_limit: int | None
+    interest_rate: float | None
+    loan_term: int | None
 
     class Config:
         orm_mode = True

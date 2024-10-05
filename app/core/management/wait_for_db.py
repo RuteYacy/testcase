@@ -5,9 +5,9 @@ from psycopg2 import OperationalError
 
 DB_HOST = os.getenv("DB_HOST", "db")
 DB_PORT = os.getenv("DB_PORT", 5432)
-DB_USER = os.getenv("DB_USER", "postgres")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "password")
-DB_NAME = os.getenv("DB_NAME", "postgres")
+DB_USER = os.getenv("DB_USER", "cwtestcaseuser")
+DB_PASSWORD = os.getenv("DB_PASSWORD", "cwtestcasepwd")
+DB_NAME = os.getenv("DB_NAME", "cwtestcase")
 
 def wait_for_db():
     """
