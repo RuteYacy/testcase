@@ -7,7 +7,7 @@ class User(Base):
 
     user_id = Column(Integer, primary_key=True, index=True)
     user_email = Column(String)
-    hashed_password = Column(String)
+    password = Column(String)
     score = Column(Float, index=True, default=0)
     approved_date = Column(Date, nullable=True)
     denied_date = Column(Date, nullable=True)
