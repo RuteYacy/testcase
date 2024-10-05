@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 from datetime import date
 
-class User(BaseModel):
+
+class UserSchema(BaseModel):
     user_id: int
     score: int
     approved_date: date | None

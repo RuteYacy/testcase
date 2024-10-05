@@ -6,7 +6,10 @@ COPY ./app/requirements.txt /code/requirements.txt
 
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
+RUN pip install flake8
+
 COPY ./app /code/app
+COPY .flake8 /code/.flake8
 
 EXPOSE 8000
 

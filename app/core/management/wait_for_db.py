@@ -9,6 +9,7 @@ DB_USER = os.getenv("DB_USER", "cwtestcaseuser")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "cwtestcasepwd")
 DB_NAME = os.getenv("DB_NAME", "cwtestcase")
 
+
 def wait_for_db():
     """
     Wait until PostgreSQL is available.
@@ -29,6 +30,7 @@ def wait_for_db():
         except OperationalError:
             print("Waiting for PostgreSQL...")
             time.sleep(2)
+
 
 if __name__ == "__main__":
     wait_for_db()
