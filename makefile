@@ -13,4 +13,4 @@ purge:
 	docker volume rm -f $$(docker volume ls -q)
 
 lint:
-	docker-compose run app flake8
+	docker-compose -f docker-compose-app.yml run app flake8 /code/app --config=/code/.flake8

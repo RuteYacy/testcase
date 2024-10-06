@@ -28,7 +28,7 @@ def send_emotional_data(
     - A dictionary confirming data storage.
     """
     new_emotional_data = EmotionalData(
-        user_id=current_user.user_id,
+        user_id=current_user.id,
         happiness=emotion_data.happiness,
         stress=emotion_data.stress,
         confidence=emotion_data.confidence,
@@ -46,5 +46,5 @@ def send_emotional_data(
 
     return {
         "message": "Emotional data successfully stored",
-        "user_id": current_user.user_id
+        "user_id": current_user.id
     }

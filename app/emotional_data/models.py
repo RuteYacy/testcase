@@ -7,8 +7,8 @@ from app.core.database import Base
 class EmotionalData(Base):
     __tablename__ = "emotional_data"
 
-    data_id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     timestamp = Column(DateTime, default=datetime.now(timezone.utc), index=True)
 
     happiness = Column(Float, nullable=False)

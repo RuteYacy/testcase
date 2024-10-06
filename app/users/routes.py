@@ -41,7 +41,7 @@ def signup(user: UserSignUp, request: Request, db: Session = Depends(get_db)):
     - A dictionary containing access and refresh tokens, and user details.
     """
     # Check if a user with the given email already exists
-    user_in_db = db.query(User).filter(User.user_email == user.user_email).first()
+    user_in_db = db.query(User).filter(User.email == user.email).first()
     if user_in_db:
         raise HTTPException(status_code=400, detail="User email already registered")
 
@@ -51,18 +51,18 @@ def signup(user: UserSignUp, request: Request, db: Session = Depends(get_db)):
 
     access_token_expires = timedelta(hours=int(os.getenv('ACCESS_TOKEN_DURATION')))
     access_token = create_access_token(
-        data={"sub": new_user.user_email},
+        data={"sub": new_user.email},
         expires_delta=access_token_expires
     )
 
     refresh_token_expires = timedelta(hours=int(os.getenv('REFRESH_TOKEN_DURATION')))
     refresh_token = create_access_token(
-        data={"sub": new_user.user_email},
+        data={"sub": new_user.email},
         expires_delta=refresh_token_expires
     )
 
     new_session = Sessions(
-        user_id=new_user.user_id,
+        user_id=new_user.id,
         refresh_token=refresh_token,
         client_ip=request.client.host,
         expires_at=datetime.now(timezone.utc) + refresh_token_expires,
@@ -89,7 +89,7 @@ def signin(user: UserSignIn, request: Request, db: Session = Depends(get_db)):
     - A dictionary containing access and refresh tokens.
     """
     # Check if a user with the given email exists in the database
-    user_in_db = db.query(User).filter(User.user_email == user.user_email).first()
+    user_in_db = db.query(User).filter(User.email == user.email).first()
     if not user_in_db:
         raise HTTPException(status_code=404, detail="Invalid email or password")
 
@@ -98,19 +98,19 @@ def signin(user: UserSignIn, request: Request, db: Session = Depends(get_db)):
 
     access_token_expires = timedelta(hours=int(os.getenv('ACCESS_TOKEN_DURATION')))
     access_token = create_access_token(
-        data={"sub": user_in_db.user_email},
+        data={"sub": user_in_db.email},
         expires_delta=access_token_expires
     )
 
     refresh_token_expires = timedelta(hours=int(os.getenv('REFRESH_TOKEN_DURATION')))
     refresh_token = create_access_token(
-        data={"sub": user_in_db.user_email},
+        data={"sub": user_in_db.email},
         expires_delta=refresh_token_expires
     )
 
     # Store the session in the database
     new_session = Sessions(
-        user_id=user_in_db.user_id,
+        user_id=user_in_db.id,
         refresh_token=refresh_token,
         client_ip=request.client.host,
         expires_at=datetime.now(timezone.utc) + refresh_token_expires,

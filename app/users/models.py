@@ -5,8 +5,8 @@ from app.core.database import Base
 class User(Base):
     __tablename__ = "users"
 
-    user_id = Column(Integer, primary_key=True, index=True)
-    user_email = Column(String)
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String)
     password = Column(String)
     score = Column(Float, index=True, default=0)
     approved_date = Column(Date, nullable=True)
