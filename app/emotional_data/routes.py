@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 from app.emotional_data.models import EmotionalData
 from app.emotional_data.schemas import EmotionalDataInput
 
-from app.dependencies import get_current_user
+from app.dependencies import get_auth_user
 from app.core.database import get_db
 from app.users.models import User
 
@@ -19,7 +19,7 @@ router = APIRouter(
 def send_emotional_data(
     emotion_data: EmotionalDataInput,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_auth_user),
 ):
     """
     Submit user's emotional data to be processed and stored.

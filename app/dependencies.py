@@ -15,7 +15,7 @@ api_key_header = APIKeyHeader(
 )
 
 
-def get_current_user(db: Session = Depends(get_db), token: str = Depends(api_key_header)):
+def get_auth_user(db: Session = Depends(get_db), token: str = Depends(api_key_header)):
     credentials_exception = HTTPException(
         status_code=401, detail="Could not validate credentials"
     )
@@ -37,7 +37,7 @@ def get_current_user(db: Session = Depends(get_db), token: str = Depends(api_key
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-    user = db.query(User).filter(User.user_email == user_email).first()
+    user = db.query(User).filter(User.email == user_email).first()
     if user is None:
         raise credentials_exception
 
