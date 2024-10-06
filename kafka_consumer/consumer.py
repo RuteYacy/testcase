@@ -2,11 +2,13 @@ import logging
 
 from aiokafka import AIOKafkaConsumer
 
-from app.kafka.constants import KAFKA_SERVER, EMOTIONAL_DATA_TOPIC
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
+
+EMOTIONAL_DATA_TOPIC = 'emotional_data_topic'
+KAFKA_SERVER = 'kafka:29092'
 
 
 class KafkaConsumer:
@@ -15,7 +17,8 @@ class KafkaConsumer:
             EMOTIONAL_DATA_TOPIC,
             bootstrap_servers=KAFKA_SERVER,
             group_id="emotional-data",
-            auto_offset_reset="earliest",
+            enable_auto_commit=True,
+            auto_offset_reset="latest",
         )
 
     async def start(self):

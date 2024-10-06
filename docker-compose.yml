@@ -17,6 +17,25 @@ services:
     command: >
       sh -c "python app/core/management/wait_for_db.py &&
              uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    depends_on:
+      - kafka
+    links:
+      - kafka
+
+  kafka_consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile.consumer
+    environment:
+      DATABASE_URL: postgres://cwtestcaseuser:cwtestcasepwd@db:5432/cwtestcase
+      BOOT_STRAP_SERVER: kafka:29092
+    env_file:
+      - .env
+    volumes:
+      - .:/code
+    working_dir: /code/kafka_consumer
+    command: >
+      sh -c "python main.py"
 
   db:
     image: postgres:13
@@ -58,6 +77,7 @@ services:
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
 
 volumes:
   postgres_data:

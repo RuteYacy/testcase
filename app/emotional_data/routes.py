@@ -5,8 +5,7 @@ from fastapi import APIRouter, Depends
 from app.emotional_data.models import EmotionalData
 from app.emotional_data.schemas import EmotionalDataInput
 
-from app.kafka.producer import kafkaProducer
-from app.kafka.constants import EMOTIONAL_DATA_TOPIC
+from app.kafka.producer import KafkaProducer, EMOTIONAL_DATA_TOPIC
 
 from app.dependencies import get_auth_user
 from app.core.database import get_db
@@ -49,7 +48,11 @@ async def send_emotional_data(
         "situation": emotion_data.situation,
     }
 
-    await kafkaProducer.produce(topic=EMOTIONAL_DATA_TOPIC, value={"data": data})
+    try:
+        await KafkaProducer.produce(topic=EMOTIONAL_DATA_TOPIC, value={"data": data})
+        print("Message sent to Kafka")
+    except Exception as e:
+        print(f"Failed to send message to Kafka: {e}")
 
     return {
         "message": "Emotional data successfully stored and sent to Kafka",

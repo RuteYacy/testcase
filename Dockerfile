@@ -2,14 +2,14 @@ FROM python:3.10-slim
 
 WORKDIR /code
 
-COPY ./app/requirements.txt /code/requirements.txt
+COPY requirements.txt .
 
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
 RUN pip install flake8
 
-COPY ./app /code/app
-COPY .flake8 /code/.flake8
+COPY ./app ./app
+COPY .flake8 .flake8
 
 EXPOSE 8000
 
