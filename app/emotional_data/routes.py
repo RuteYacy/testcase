@@ -32,16 +32,10 @@ async def send_emotional_data(
     """
     new_emotional_data = EmotionalData(
         user_id=current_user.id,
-        happiness=emotion_data.happiness,
-        stress=emotion_data.stress,
-        confidence=emotion_data.confidence,
-        anxiety=emotion_data.anxiety,
-        sadness=emotion_data.sadness,
-        anger=emotion_data.anger,
-        excitement=emotion_data.excitement,
-        fear=emotion_data.fear,
-        thought_data=emotion_data.thought_data,
-        timestamp=datetime.now()
+        timestamp=datetime.now(),
+        primary_emotion=emotion_data.primary_emotion,
+        intensity=emotion_data.intensity,
+        situation=emotion_data.situation,
     )
 
     db.add(new_emotional_data)
@@ -49,16 +43,10 @@ async def send_emotional_data(
 
     data = {
         "user_id": current_user.id,
-        "happiness": emotion_data.happiness,
-        "stress": emotion_data.stress,
-        "confidence": emotion_data.confidence,
-        "anxiety": emotion_data.anxiety,
-        "sadness": emotion_data.sadness,
-        "anger": emotion_data.anger,
-        "excitement": emotion_data.excitement,
-        "fear": emotion_data.fear,
-        "thought_data": emotion_data.thought_data,
         "timestamp": new_emotional_data.timestamp.isoformat(),
+        "primary_emotion": emotion_data.primary_emotion,
+        "intensity": emotion_data.intensity,
+        "situation": emotion_data.situation,
     }
 
     await kafkaProducer.produce(topic=EMOTIONAL_DATA_TOPIC, value={"data": data})
