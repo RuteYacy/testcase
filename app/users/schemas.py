@@ -4,8 +4,8 @@ from datetime import date
 
 
 class UserSchema(BaseModel):
-    user_id: Optional[int] = None
-    user_email: str
+    id: Optional[int] = None
+    email: str
     approved_date: Optional[date] = None
     denied_date: Optional[date] = None
     credit_limit: Optional[int] = None
@@ -19,10 +19,10 @@ class UserSchema(BaseModel):
 
 
 class UserSignUp(BaseModel):
-    user_email: str
+    email: str
     password: str
 
 
 class UserSignIn(BaseModel):
-    user_email: str
+    email: str
     password: str

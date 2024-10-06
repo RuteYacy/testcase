@@ -6,7 +6,7 @@ from typing import Optional
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # The algorithm to use for signing the JWT tokens
-ALGORITHM = "HS256"
+ALGORITHM = os.getenv("ALGORITHM")
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

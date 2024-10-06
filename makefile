@@ -1,11 +1,16 @@
-build:
-	docker-compose build
-run:
-	docker-compose up
+run-infra:
+	docker-compose -f docker-compose-infra.yml up -d
+
+run-app:
+	docker-compose -f docker-compose-app.yml up app
+
 down:
-	docker-compose down
+	docker-compose -f docker-compose-infra.yml -f docker-compose-app.yml down
+
 purge:
-	docker-compose -f docker-compose.yml down -v --rmi local
+	docker-compose -f docker-compose-infra.yml down -v --rmi local
+	docker-compose -f docker-compose-app.yml down -v --rmi local
 	docker volume rm -f $$(docker volume ls -q)
+
 lint:
-	docker-compose run web flake8
+	docker-compose -f docker-compose-app.yml run app flake8 /code/app --config=/code/.flake8
