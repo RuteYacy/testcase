@@ -5,10 +5,12 @@ from fastapi import APIRouter, Depends
 from app.emotional_data.models import EmotionalData
 from app.emotional_data.schemas import EmotionalDataInput
 
+from app.kafka.producer import kafkaProducer
+from app.kafka.constants import EMOTIONAL_DATA_TOPIC
+
 from app.dependencies import get_auth_user
 from app.core.database import get_db
 from app.users.models import User
-from app.kafka.producer import submit_emotional_data_to_kafka
 
 router = APIRouter(
     prefix="/emotional-data",
@@ -17,7 +19,7 @@ router = APIRouter(
 
 
 @router.post("/send-data", response_model=dict)
-def send_emotional_data(
+async def send_emotional_data(
     emotion_data: EmotionalDataInput,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_auth_user),
@@ -45,7 +47,7 @@ def send_emotional_data(
     db.add(new_emotional_data)
     db.commit()
 
-    emotional_data_dict = {
+    data = {
         "user_id": current_user.id,
         "happiness": emotion_data.happiness,
         "stress": emotion_data.stress,
@@ -59,7 +61,7 @@ def send_emotional_data(
         "timestamp": new_emotional_data.timestamp.isoformat(),
     }
 
-    submit_emotional_data_to_kafka(emotional_data_dict)
+    await kafkaProducer.produce(topic=EMOTIONAL_DATA_TOPIC, value={"data": data})
 
     return {
         "message": "Emotional data successfully stored and sent to Kafka",

@@ -1,15 +1,25 @@
 import json
-from kafka import KafkaProducer
+import logging
 
-from app.kafka.constants import EMOTIONAL_DATA_TOPIC, KAFKA_SERVER
+from aiokafka import AIOKafkaProducer
 
+from app.kafka.constants import KAFKA_SERVER
 
-producer = KafkaProducer(
-    bootstrap_servers=KAFKA_SERVER,
-    value_serializer=lambda v: json.dumps(v).encode('utf-8')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
 
-def submit_emotional_data_to_kafka(user_data):
-    producer.send(EMOTIONAL_DATA_TOPIC, value=user_data)
-    producer.flush()
+class kafkaProducer:
+    async def produce(topic, value):
+        try:
+            producer = AIOKafkaProducer(bootstrap_servers=KAFKA_SERVER)
+            await producer.start()
+
+            try:
+                await producer.send_and_wait(topic, json.dumps(value).encode())
+            finally:
+                await producer.stop()
+
+        except Exception as err:
+            logging.log(f"Some Kafka error: {err}")

@@ -1,35 +1,42 @@
-import json
 import logging
-from kafka import KafkaConsumer
-from app.kafka.constants import EMOTIONAL_DATA_TOPIC, KAFKA_SERVER
+
+from aiokafka import AIOKafkaConsumer
+
+from app.kafka.constants import KAFKA_SERVER, EMOTIONAL_DATA_TOPIC
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
 
-class KafkaConsumerHandler:
-    def __init__(self, loop):
-        self.loop = loop
-        self.consumer = KafkaConsumer(
+class KafkaConsumer:
+    def __init__(self):
+        self.consumer = AIOKafkaConsumer(
             EMOTIONAL_DATA_TOPIC,
             bootstrap_servers=KAFKA_SERVER,
-            auto_offset_reset='earliest',
-            enable_auto_commit=True,
-            value_deserializer=lambda x: json.loads(x.decode('utf-8'))
+            group_id="emotional-data",
+            auto_offset_reset="earliest",
         )
 
-    async def consume(self):
-        print("Starting Kafka Consumer...")
+    async def start(self):
         try:
             await self.consumer.start()
-
+            print('Kafka consumer started')
         except Exception as e:
-            logging.info(str(e))
-            return
+            logging.error(f"Error starting consumer: {e}")
+            raise e
 
+    async def consume(self):
+        print('Starting consumer loop')
         try:
             async for msg in self.consumer:
-                msg.value.decode("utf-8")
+                decoded_message = msg.value.decode("utf-8")
+                print(f"Received message: {decoded_message}")
+        except Exception as e:
+            logging.error(f"Exception in consumer loop: {e}")
         finally:
-            await self.consumer.stop()
+            pass
+
+    async def stop(self):
+        await self.consumer.stop()
+        print('Kafka consumer stopped')
