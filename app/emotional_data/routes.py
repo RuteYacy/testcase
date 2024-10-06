@@ -1,13 +1,14 @@
 from datetime import datetime
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Depends, status
 
-from app.emotional_data.models import EmotionalData
 from app.emotional_data.schemas import EmotionalDataInput
 
 from app.dependencies import get_auth_user
 from app.core.database import get_db
 from app.users.models import User
+from app.kafka.producer import submit_emotional_data_to_kafka
 
 router = APIRouter(
     prefix="/emotional-data",
@@ -27,24 +28,23 @@ def send_emotional_data(
     Returns:
     - A dictionary confirming data storage.
     """
-    new_emotional_data = EmotionalData(
-        user_id=current_user.id,
-        happiness=emotion_data.happiness,
-        stress=emotion_data.stress,
-        confidence=emotion_data.confidence,
-        anxiety=emotion_data.anxiety,
-        sadness=emotion_data.sadness,
-        anger=emotion_data.anger,
-        excitement=emotion_data.excitement,
-        fear=emotion_data.fear,
-        thought_data=emotion_data.thought_data,
-        timestamp=datetime.now()
-    )
-
-    db.add(new_emotional_data)
-    db.commit()
-
-    return {
-        "message": "Emotional data successfully stored",
-        "user_id": current_user.id
+    data = {
+        "user_id": current_user.id,
+        "happiness": emotion_data.happiness,
+        "stress": emotion_data.stress,
+        "confidence": emotion_data.confidence,
+        "anxiety": emotion_data.anxiety,
+        "sadness": emotion_data.sadness,
+        "anger": emotion_data.anger,
+        "excitement": emotion_data.excitement,
+        "fear": emotion_data.fear,
+        "thought_data": emotion_data.thought_data,
+        "timestamp": datetime.now().isoformat()
     }
+
+    submit_emotional_data_to_kafka(data)
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={"message": "ok"}
+    )
