@@ -11,8 +11,8 @@ from app.users.schemas import UserSchema, UserSignUp, UserSignIn
 from app.users.crud import create_user
 
 from app.core.database import get_db
-from app.sessions.token import create_access_token
-from app.users.password import verify_password
+from app.sessions.service import create_access_token
+from app.users.service import verify_password
 
 router = APIRouter(
     prefix="/users",
