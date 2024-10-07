@@ -28,6 +28,7 @@ services:
     environment:
       DATABASE_URL: postgres://cwtestcaseuser:cwtestcasepwd@db:5432/cwtestcase
       BOOT_STRAP_SERVER: kafka:29092
+      PYTHONUNBUFFERED: 1
     env_file:
       - .env
     working_dir: /code/kafka_consumer

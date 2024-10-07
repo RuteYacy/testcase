@@ -1,37 +1,41 @@
 import json
 import logging
-from aiokafka import AIOKafkaProducer
-
+from kafka import KafkaProducer
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
 EMOTIONAL_DATA_TOPIC = 'emotional_data_topic'
+EMOTIONAL_DATA_CLIENT = 'emotional_data_client'
 KAFKA_SERVER = 'kafka:29092'
 
 
-class KafkaProducer:
+class KafkaProducerWrapper:
     _producer = None
 
     @classmethod
-    async def initialize(cls):
+    def initialize(cls):
         if cls._producer is None:
-            cls._producer = AIOKafkaProducer(bootstrap_servers=KAFKA_SERVER)
-            await cls._producer.start()
+            cls._producer = KafkaProducer(
+                bootstrap_servers=KAFKA_SERVER,
+                value_serializer=lambda v: json.dumps(v).encode('utf-8')
+            )
             logging.info("Kafka producer started")
 
     @classmethod
-    async def produce(cls, topic, value):
+    def produce(cls, topic, value):
         if cls._producer is None:
-            await cls.initialize()
+            cls.initialize()
         try:
-            await cls._producer.send(topic, json.dumps(value).encode())
+            cls._producer.send(topic, value=value)
+            cls._producer.flush()
+            logging.info("Message sent to Kafka")
         except Exception as err:
             logging.error(f"Kafka producer error: {err}")
 
     @classmethod
-    async def close(cls):
+    def close(cls):
         if cls._producer:
-            await cls._producer.stop()
+            cls._producer.close()
             cls._producer = None

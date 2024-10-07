@@ -2,26 +2,19 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
 from app.core.database import init_db
-from app.kafka.producer import KafkaProducer
-
 from app.users.routes import router as user_router
 from app.emotional_data.routes import router as emotional_data_router
-
-
-app = FastAPI()
+from app.kafka_producer.producer import KafkaProducerWrapper
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
+    KafkaProducerWrapper.initialize()
     try:
-        await KafkaProducer.initialize()
         yield
-    except Exception as e:
-        print("Exception during startup")
-        raise e
     finally:
-        await KafkaProducer.close()
+        KafkaProducerWrapper.close()
 
 
 app = FastAPI(lifespan=lifespan)
