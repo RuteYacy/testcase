@@ -1,18 +1,18 @@
 import os
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
-from datetime import timedelta, datetime, timezone
+from datetime import timedelta
 from typing import List
 
-from app.sessions.models import Sessions
+from app.sessions.crud import create_session
 
 from app.users.models import User
 from app.users.schemas import UserSchema, UserSignUp, UserSignIn
 from app.users.crud import create_user
 
 from app.core.database import get_db
-from app.core.token import create_access_token
-from app.core.password import verify_password
+from app.sessions.service import create_access_token
+from app.users.service import verify_password
 
 router = APIRouter(
     prefix="/users",
@@ -61,15 +61,13 @@ def signup(user: UserSignUp, request: Request, db: Session = Depends(get_db)):
         expires_delta=refresh_token_expires
     )
 
-    new_session = Sessions(
+    create_session(
+        db=db,
         user_id=new_user.id,
         refresh_token=refresh_token,
         client_ip=request.client.host,
-        expires_at=datetime.now(timezone.utc) + refresh_token_expires,
-        created_at=datetime.now(timezone.utc)
+        refresh_token_expires=refresh_token_expires
     )
-    db.add(new_session)
-    db.commit()
 
     user_response = UserSchema.model_validate(new_user)
 
@@ -108,16 +106,13 @@ def signin(user: UserSignIn, request: Request, db: Session = Depends(get_db)):
         expires_delta=refresh_token_expires
     )
 
-    # Store the session in the database
-    new_session = Sessions(
+    create_session(
+        db=db,
         user_id=user_in_db.id,
         refresh_token=refresh_token,
         client_ip=request.client.host,
-        expires_at=datetime.now(timezone.utc) + refresh_token_expires,
-        created_at=datetime.now(timezone.utc)
+        refresh_token_expires=refresh_token_expires
     )
-    db.add(new_session)
-    db.commit()
 
     return {
         "access_token": access_token,

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.users.schemas import UserSignUp
 from app.users.models import User
 
-from app.core.password import get_password_hash
+from app.users.service import get_password_hash
 
 
 def create_user(db: Session, user: UserSignUp):

@@ -1,0 +1,81 @@
+version: '3.9'
+
+services:
+  app:
+    build: .
+    container_name: app
+    environment:
+      DATABASE_URL: postgres://cwtestcaseuser:cwtestcasepwd@db:5432/cwtestcase
+      BOOT_STRAP_SERVER: kafka:29092
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/code
+    working_dir: /code
+    command: >
+      sh -c "python app/core/management/wait_for_db.py &&
+             python app/core/management/wait_for_kafka.py &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    depends_on:
+      - kafka
+
+  kafka_consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile.consumer
+    environment:
+      DATABASE_URL: postgres://cwtestcaseuser:cwtestcasepwd@db:5432/cwtestcase
+      BOOT_STRAP_SERVER: kafka:29092
+      PYTHONUNBUFFERED: 1
+    env_file:
+      - .env
+    working_dir: /code/kafka_consumer
+    command: >
+      sh -c "python wait_for_kafka.py && python main.py"
+
+  db:
+    image: postgres:13
+    container_name: database
+    environment:
+      POSTGRES_USER: cwtestcaseuser
+      POSTGRES_PASSWORD: cwtestcasepwd
+      POSTGRES_DB: cwtestcase
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 2181:2181
+      - 2888:2888
+      - 3888:3888
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    container_name: kafka
+    restart: "no"
+    links:
+      - zookeeper
+    ports:
+      - 9092:9092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: INTERNAL://:29092,EXTERNAL://:9092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+
+volumes:
+  postgres_data:

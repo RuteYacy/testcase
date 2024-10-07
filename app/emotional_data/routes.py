@@ -5,6 +5,8 @@ from fastapi import APIRouter, Depends
 from app.emotional_data.models import EmotionalData
 from app.emotional_data.schemas import EmotionalDataInput
 
+from app.kafka_producer.producer import KafkaProducerWrapper, EMOTIONAL_DATA_TOPIC
+
 from app.dependencies import get_auth_user
 from app.core.database import get_db
 from app.users.models import User
@@ -16,7 +18,7 @@ router = APIRouter(
 
 
 @router.post("/send-data", response_model=dict)
-def send_emotional_data(
+async def send_emotional_data(
     emotion_data: EmotionalDataInput,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_auth_user),
@@ -29,22 +31,29 @@ def send_emotional_data(
     """
     new_emotional_data = EmotionalData(
         user_id=current_user.id,
-        happiness=emotion_data.happiness,
-        stress=emotion_data.stress,
-        confidence=emotion_data.confidence,
-        anxiety=emotion_data.anxiety,
-        sadness=emotion_data.sadness,
-        anger=emotion_data.anger,
-        excitement=emotion_data.excitement,
-        fear=emotion_data.fear,
-        thought_data=emotion_data.thought_data,
-        timestamp=datetime.now()
+        timestamp=datetime.now(),
+        primary_emotion=emotion_data.primary_emotion,
+        intensity=emotion_data.intensity,
+        situation=emotion_data.situation,
     )
 
     db.add(new_emotional_data)
     db.commit()
 
+    data = {
+        "user_id": current_user.id,
+        "timestamp": new_emotional_data.timestamp.isoformat(),
+        "primary_emotion": emotion_data.primary_emotion,
+        "intensity": emotion_data.intensity,
+        "situation": emotion_data.situation,
+    }
+
+    try:
+        KafkaProducerWrapper.produce(topic=EMOTIONAL_DATA_TOPIC, value={"data": data})
+    except Exception as e:
+        print(f"Failed to send message to Kafka: {e}")
+
     return {
-        "message": "Emotional data successfully stored",
+        "message": "Emotional data successfully stored and sent to Kafka",
         "user_id": current_user.id
     }
