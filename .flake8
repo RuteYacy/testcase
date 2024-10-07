@@ -3,3 +3,4 @@ max-line-length = 90
 exclude =
     __pycache__,
     .git,
+    app/scripts/

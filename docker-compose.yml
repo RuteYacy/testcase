@@ -63,7 +63,6 @@ services:
   kafka:
     image: wurstmeister/kafka:latest
     container_name: kafka
-    restart: "no"
     links:
       - zookeeper
     ports:
