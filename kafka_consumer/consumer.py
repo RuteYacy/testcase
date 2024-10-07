@@ -14,7 +14,7 @@ async def consume():
         EMOTIONAL_DATA_TOPIC,
         bootstrap_servers=KAFKA_SERVER,
         group_id="emotional-data",
-        enable_auto_commit=True,
+        enable_auto_commit=False,
         auto_offset_reset="earliest",
     )
     await consumer.start()

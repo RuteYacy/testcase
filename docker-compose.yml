@@ -32,7 +32,7 @@ services:
       - .env
     working_dir: /code/kafka_consumer
     command: >
-      sh -c "python main.py"
+      sh -c "python wait_for_kafka.py && python main.py"
 
   db:
     image: postgres:13

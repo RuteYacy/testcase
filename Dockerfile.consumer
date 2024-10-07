@@ -8,4 +8,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY ./kafka_consumer ./kafka_consumer
 
-CMD ["python", "main.py"]
+CMD ["python", "wait_for_kafka.py && main.py"]

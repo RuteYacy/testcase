@@ -19,6 +19,7 @@ class KafkaProducer:
         if cls._producer is None:
             cls._producer = AIOKafkaProducer(bootstrap_servers=KAFKA_SERVER)
             await cls._producer.start()
+            logging.info("Kafka producer started")
 
     @classmethod
     async def produce(cls, topic, value):
