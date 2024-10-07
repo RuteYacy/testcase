@@ -47,12 +47,12 @@ def consume():
     )
 
     try:
-        print("Kafka consumer started and waiting for messages...")
+        logging.info("Kafka consumer started and waiting for messages...")
         for message in consumer:
             decoded_message = message.value
-            print(f"Received message: {decoded_message}")
+            logging.info(f"Received message: {decoded_message}")
     except Exception as e:
         logging.error(f"Exception in consumer loop: {e}")
     finally:
         consumer.close()
-        print('Kafka consumer stopped')
+        logging.info('Kafka consumer stopped')
