@@ -14,8 +14,14 @@ app = FastAPI()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
-    await KafkaProducer.initialize()
-    yield
+    try:
+        await KafkaProducer.initialize()
+        yield
+    except Exception as e:
+        print("Exception during startup")
+        raise e
+    finally:
+        await KafkaProducer.close()
 
 
 app = FastAPI(lifespan=lifespan)

@@ -16,10 +16,9 @@ services:
     working_dir: /code
     command: >
       sh -c "python app/core/management/wait_for_db.py &&
+             python app/core/management/wait_for_kafka.py &&
              uvicorn app.main:app --host 0.0.0.0 --port 8000"
     depends_on:
-      - kafka
-    links:
       - kafka
 
   kafka_consumer:
@@ -31,8 +30,6 @@ services:
       BOOT_STRAP_SERVER: kafka:29092
     env_file:
       - .env
-    volumes:
-      - .:/code
     working_dir: /code/kafka_consumer
     command: >
       sh -c "python main.py"
@@ -74,7 +71,7 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENERS: INTERNAL://:29092,EXTERNAL://:9092
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://kafka:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'

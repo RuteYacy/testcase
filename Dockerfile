@@ -13,4 +13,4 @@ COPY .flake8 .flake8
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "python app/core/management/wait_for_db.py && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+CMD ["sh", "-c", "python app/core/management/wait_for_db.py && python app/core/management/wait_for_kafka.py && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
