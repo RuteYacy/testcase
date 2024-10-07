@@ -1,7 +1,10 @@
 import json
 import logging
-from kafka import KafkaConsumer, KafkaAdminClient
+
 from kafka.admin import NewTopic
+from kafka import KafkaConsumer, KafkaAdminClient
+
+from utils.calculate_credit_limit import get_recent_transactions
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -34,7 +37,7 @@ def ensure_topic_exists():
         admin_client.close()
 
 
-def consume():
+async def consume():
     ensure_topic_exists()
 
     consumer = KafkaConsumer(
@@ -51,6 +54,7 @@ def consume():
         for message in consumer:
             decoded_message = message.value
             logging.info(f"Received message: {decoded_message}")
+            get_recent_transactions(1)
     except Exception as e:
         logging.error(f"Exception in consumer loop: {e}")
     finally:

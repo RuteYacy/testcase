@@ -1,11 +1,10 @@
 import asyncio
-from consumer import consume
+from kafka_consumer.consumer import consume
 from database import init_db
 
 
 def main():
     init_db()
-
     asyncio.run(consume())
 
 
