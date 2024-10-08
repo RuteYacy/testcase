@@ -1,7 +1,13 @@
 import json
 import logging
-from kafka import KafkaConsumer, KafkaAdminClient
+
 from kafka.admin import NewTopic
+from kafka import KafkaConsumer, KafkaAdminClient
+
+from store.user_store import update_credit_limit
+from store.emotional_data_store import update_data_score
+
+from utils.calculate_credit_limit import get_credit_limit
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -34,7 +40,7 @@ def ensure_topic_exists():
         admin_client.close()
 
 
-def consume():
+async def consume():
     ensure_topic_exists()
 
     consumer = KafkaConsumer(
@@ -51,6 +57,22 @@ def consume():
         for message in consumer:
             decoded_message = message.value
             logging.info(f"Received message: {decoded_message}")
+
+            data = decoded_message.get("data", {})
+            data_id = data.get("data_id")
+            user_id = data.get("user_id")
+            primary_emotion = data.get("primary_emotion")
+            intensity = data.get("intensity")
+            context = data.get("context")
+
+            risk_score, final_credit_limit = get_credit_limit(
+                user_id,
+                primary_emotion,
+                intensity,
+                context,
+            )
+            await update_credit_limit(user_id, final_credit_limit)
+            await update_data_score(data_id, risk_score, final_credit_limit)
     except Exception as e:
         logging.error(f"Exception in consumer loop: {e}")
     finally:

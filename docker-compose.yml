@@ -21,17 +21,18 @@ services:
     depends_on:
       - kafka
 
-  kafka_consumer:
+  worker:
     build:
       context: .
-      dockerfile: Dockerfile.consumer
+      dockerfile: Dockerfile.worker
+    container_name: worker
     environment:
       DATABASE_URL: postgres://cwtestcaseuser:cwtestcasepwd@db:5432/cwtestcase
       BOOT_STRAP_SERVER: kafka:29092
       PYTHONUNBUFFERED: 1
     env_file:
       - .env
-    working_dir: /code/kafka_consumer
+    working_dir: /code/worker
     command: >
       sh -c "python wait_for_kafka.py && python main.py"
 
@@ -63,7 +64,6 @@ services:
   kafka:
     image: wurstmeister/kafka:latest
     container_name: kafka
-    restart: "no"
     links:
       - zookeeper
     ports:

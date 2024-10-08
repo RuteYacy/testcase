@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from sqlalchemy import Column, Integer, Float, DateTime, String, ForeignKey
 
-from app.core.database import Base
+from database import Base
 
 
 class EmotionalData(Base):

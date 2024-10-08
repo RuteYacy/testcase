@@ -7,7 +7,7 @@ from app.emotional_data.schemas import EmotionalDataInput
 
 from app.kafka_producer.producer import KafkaProducerWrapper, EMOTIONAL_DATA_TOPIC
 
-from app.dependencies import get_auth_user
+from app.core.dependencies import get_auth_user
 from app.core.database import get_db
 from app.users.models import User
 
@@ -34,18 +34,20 @@ async def send_emotional_data(
         timestamp=datetime.now(),
         primary_emotion=emotion_data.primary_emotion,
         intensity=emotion_data.intensity,
-        situation=emotion_data.situation,
+        context=emotion_data.context,
     )
 
     db.add(new_emotional_data)
     db.commit()
+    db.refresh(new_emotional_data)
 
     data = {
+        "data_id": new_emotional_data.id,
         "user_id": current_user.id,
         "timestamp": new_emotional_data.timestamp.isoformat(),
         "primary_emotion": emotion_data.primary_emotion,
         "intensity": emotion_data.intensity,
-        "situation": emotion_data.situation,
+        "context": emotion_data.context,
     }
 
     try:
