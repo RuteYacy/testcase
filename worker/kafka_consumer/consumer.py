@@ -7,7 +7,7 @@ from kafka import KafkaConsumer, KafkaAdminClient
 from store.user_store import update_credit_limit
 from store.emotional_data_store import update_data_score
 
-from utils.calculate_credit_limit import get_credit_limit
+from ml_engine.credit_analysis import get_credit_limit
 
 EMOTIONAL_DATA_TOPIC = 'emotional_data_topic'
 EMOTIONAL_DATA_CLIENT = 'emotional_data_client'

@@ -1,5 +1,6 @@
-from config import logger
 import numpy as np
+from config import logger
+
 from store.transaction_store import get_recent_transactions
 
 
