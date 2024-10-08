@@ -7,3 +7,4 @@ flake8>=7.1.1
 passlib>=1.7.4
 PyJWT>=2.9.0
 kafka-python>=2.0.2
+numpy>=2.0.2

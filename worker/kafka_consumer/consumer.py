@@ -4,7 +4,7 @@ import logging
 from kafka.admin import NewTopic
 from kafka import KafkaConsumer, KafkaAdminClient
 
-from utils.calculate_credit_limit import get_recent_transactions
+from utils.calculate_credit_limit import process_emotional_data
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -54,7 +54,22 @@ async def consume():
         for message in consumer:
             decoded_message = message.value
             logging.info(f"Received message: {decoded_message}")
-            get_recent_transactions(1)
+
+            data = decoded_message.get("data", {})
+            user_id = data.get("user_id")
+            primary_emotion = data.get("primary_emotion")
+            intensity = data.get("intensity")
+            duration = data.get("duration")
+            context = data.get("context")
+
+            final_credit_limit = process_emotional_data(
+                user_id,
+                primary_emotion,
+                intensity,
+                duration,
+                context,
+            )
+            print(final_credit_limit)
     except Exception as e:
         logging.error(f"Exception in consumer loop: {e}")
     finally:

@@ -34,7 +34,7 @@ async def send_emotional_data(
         timestamp=datetime.now(),
         primary_emotion=emotion_data.primary_emotion,
         intensity=emotion_data.intensity,
-        situation=emotion_data.situation,
+        context=emotion_data.context,
     )
 
     db.add(new_emotional_data)
@@ -45,7 +45,7 @@ async def send_emotional_data(
         "timestamp": new_emotional_data.timestamp.isoformat(),
         "primary_emotion": emotion_data.primary_emotion,
         "intensity": emotion_data.intensity,
-        "situation": emotion_data.situation,
+        "context": emotion_data.context,
     }
 
     try:
