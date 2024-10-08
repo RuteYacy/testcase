@@ -39,8 +39,10 @@ async def send_emotional_data(
 
     db.add(new_emotional_data)
     db.commit()
+    db.refresh(new_emotional_data)
 
     data = {
+        "data_id": new_emotional_data.id,
         "user_id": current_user.id,
         "timestamp": new_emotional_data.timestamp.isoformat(),
         "primary_emotion": emotion_data.primary_emotion,
