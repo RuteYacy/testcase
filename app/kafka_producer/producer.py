@@ -1,10 +1,6 @@
 import json
-from app.config import logger
+from app.config import logger, KAFKA_SERVER
 from kafka import KafkaProducer
-
-EMOTIONAL_DATA_TOPIC = 'emotional_data_topic'
-EMOTIONAL_DATA_CLIENT = 'emotional_data_client'
-KAFKA_SERVER = 'kafka:29092'
 
 
 class KafkaProducerWrapper:

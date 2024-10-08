@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends
 from app.emotional_data.models import EmotionalData
 from app.emotional_data.schemas import EmotionalDataInput
 
-from app.kafka_producer.producer import KafkaProducerWrapper, EMOTIONAL_DATA_TOPIC
+from app.kafka_producer.services import produce_emotional_data_message
 
 from app.core.dependencies import get_auth_user
 from app.core.database import get_db
@@ -43,17 +43,14 @@ async def send_emotional_data(
     db.commit()
     db.refresh(new_emotional_data)
 
-    data = {
-        "data_id": new_emotional_data.id,
-        "user_id": current_user.id,
-        "timestamp": new_emotional_data.timestamp.isoformat(),
-        "primary_emotion": emotion_data.primary_emotion,
-        "intensity": emotion_data.intensity,
-        "context": emotion_data.context,
-    }
-
     try:
-        KafkaProducerWrapper.produce(topic=EMOTIONAL_DATA_TOPIC, value={"data": data})
+        produce_emotional_data_message(
+            data_id=new_emotional_data.id,
+            user_id=current_user.id,
+            primary_emotion=emotion_data.primary_emotion,
+            intensity=emotion_data.intensity,
+            context=emotion_data.context,
+        )
     except Exception as e:
         logger.error(f"Failed to send message to Kafka: {e}")
 
