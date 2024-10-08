@@ -9,6 +9,7 @@ from app.core.database import get_db
 from app.users.models import User
 
 
+# Define an API key header to extract the token from the request headers.
 api_key_header = APIKeyHeader(
     name="Authorization",
     description="Enter the value in this format: `bearer accesstoken`"
@@ -21,6 +22,7 @@ def get_auth_user(db: Session = Depends(get_db), token: str = Depends(api_key_he
     )
 
     try:
+        # Extract the scheme (bearer) and token from the header value.
         scheme, _, token = token.partition(" ")
         if scheme.lower() != "bearer":
             raise credentials_exception
@@ -29,6 +31,7 @@ def get_auth_user(db: Session = Depends(get_db), token: str = Depends(api_key_he
             token, os.getenv("SECRET_KEY"),
             algorithms=[os.getenv("ALGORITHM")],
         )
+        # Extract the user email from the token payload.
         user_email: str = payload.get("sub")
         if user_email is None:
             raise credentials_exception

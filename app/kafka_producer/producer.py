@@ -12,13 +12,14 @@ KAFKA_SERVER = 'kafka:29092'
 
 
 class KafkaProducerWrapper:
-    _producer = None
+    _producer = None  # Class-level variable to hold the Kafka producer instance
 
     @classmethod
     def initialize(cls):
         if cls._producer is None:
             cls._producer = KafkaProducer(
                 bootstrap_servers=KAFKA_SERVER,
+                # Serialize data to JSON format
                 value_serializer=lambda v: json.dumps(v).encode('utf-8')
             )
             logging.info("Kafka producer started")
@@ -28,6 +29,7 @@ class KafkaProducerWrapper:
         if cls._producer is None:
             cls.initialize()
         try:
+            # Send the message to the specified Kafka topic and flush the producer buffer
             cls._producer.send(topic, value=value)
             cls._producer.flush()
             logging.info("Message sent to Kafka")

@@ -7,12 +7,15 @@ from models.transaction_history import TransactionHistory
 def get_recent_transactions(user_id):
     db = next(get_db())
     try:
+        # Query the transaction history table for the user,
+        # sorted by most 30 recent transactions
         transactions = db.query(TransactionHistory).filter(
             TransactionHistory.user_id == user_id
         ).order_by(
             desc(TransactionHistory.transaction_date)
         ).limit(30).all()
 
+        # Convert each transaction record to a dictionary with relevant details
         transaction_dicts = [
             {
                 "transaction_date": transaction["transaction_date"],

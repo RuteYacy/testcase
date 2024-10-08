@@ -23,6 +23,7 @@ def ensure_topic_exists():
     try:
         existing_topics = admin_client.list_topics()
 
+        # Check if the specific topic exists, if not, create it
         if EMOTIONAL_DATA_TOPIC not in existing_topics:
             logging.info(f"Creating topic: {EMOTIONAL_DATA_TOPIC}")
             topic = NewTopic(
@@ -65,12 +66,14 @@ async def consume():
             intensity = data.get("intensity")
             context = data.get("context")
 
+            # Calculate the risk score and final credit limit based on message data
             risk_score, final_credit_limit = get_credit_limit(
                 user_id,
                 primary_emotion,
                 intensity,
                 context,
             )
+            # Update the user’s credit limit and the data score in the store
             await update_credit_limit(user_id, final_credit_limit)
             await update_data_score(data_id, risk_score, final_credit_limit)
     except Exception as e:

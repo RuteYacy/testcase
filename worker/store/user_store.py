@@ -12,15 +12,16 @@ logging.basicConfig(
 async def update_credit_limit(user_id, new_credit_limit):
     db = next(get_db())
     try:
+        # Query the user by user_id
         user = db.query(User).filter(User.id == user_id).first()
 
         if user:
             user.credit_limit = new_credit_limit
 
+            # Set the approved or denied date based on the new credit limit value
             if new_credit_limit > 0:
                 user.approved_date = datetime.now(timezone.utc)
                 user.denied_date = None
-
             elif new_credit_limit <= 0:
                 user.denied_date = datetime.now(timezone.utc)
                 user.approved_date = None
