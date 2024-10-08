@@ -4,6 +4,7 @@ import logging
 from kafka.admin import NewTopic
 from kafka import KafkaConsumer, KafkaAdminClient
 
+from store.user_store import update_credit_limit
 from utils.calculate_credit_limit import get_credit_limit
 
 logging.basicConfig(
@@ -67,7 +68,7 @@ async def consume():
                 intensity,
                 context,
             )
-            print(final_credit_limit)
+            await update_credit_limit(user_id, final_credit_limit)
     except Exception as e:
         logging.error(f"Exception in consumer loop: {e}")
     finally:
