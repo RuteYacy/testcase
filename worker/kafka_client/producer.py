@@ -1,33 +1,33 @@
 import json
-from kafka import KafkaProducer
+from aiokafka import AIOKafkaProducer
 from config import logger, KAFKA_SERVER
 
 
-class KafkaProducerWrapper:
+class KafkaProducer:
     _producer = None
 
     @classmethod
-    def initialize(cls):
+    async def initialize(cls):
         if cls._producer is None:
-            cls._producer = KafkaProducer(
-                bootstrap_servers=[KAFKA_SERVER],
+            cls._producer = AIOKafkaProducer(
+                bootstrap_servers=KAFKA_SERVER,
                 value_serializer=lambda v: json.dumps(v).encode('utf-8')
             )
-            logger.info("Kafka producer started")
+            await cls._producer.start()
+            logger.info("Async Kafka producer started")
 
     @classmethod
-    def produce(cls, topic, value):
+    async def produce(cls, topic, value):
         if cls._producer is None:
-            cls.initialize()
+            await cls.initialize()
         try:
-            cls._producer.send(topic, value=value)
-            cls._producer.flush()
+            await cls._producer.send_and_wait(topic, value=value)
             logger.info(f"Message sent to Kafka topic: {topic}")
         except Exception as err:
             logger.error(f"Kafka producer error: {err}")
 
     @classmethod
-    def close(cls):
+    async def close(cls):
         if cls._producer:
-            cls._producer.close()
+            await cls._producer.stop()
             cls._producer = None

@@ -1,11 +1,20 @@
+import asyncio
+from kafka_client.client import start_kafka, close_kafka
 from database import init_db
-from kafka_client.client import start_kafka
 
 
-def main():
+async def main():
     init_db()
-    start_kafka()
+
+    try:
+        await start_kafka()
+        while True:
+            await asyncio.sleep(1)
+    except Exception as e:
+        print(f"Error in main: {e}")
+    finally:
+        await close_kafka()
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

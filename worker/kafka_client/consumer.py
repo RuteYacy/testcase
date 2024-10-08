@@ -1,39 +1,40 @@
 import json
-from kafka import KafkaConsumer
-from config import logger, KAFKA_SERVER, EMOTIONAL_DATA_CLIENT
+from aiokafka import AIOKafkaConsumer
+from config import logger, KAFKA_SERVER
 
 
-class KafkaConsumerWrapper:
+class KafkaConsumer:
     _consumer = None
 
     @classmethod
-    def initialize(cls, topic):
+    async def initialize(cls, topic):
         if cls._consumer is None:
-            cls._consumer = KafkaConsumer(
+            cls._consumer = AIOKafkaConsumer(
                 topic,
-                bootstrap_servers=[KAFKA_SERVER],
-                group_id=EMOTIONAL_DATA_CLIENT,
+                bootstrap_servers=KAFKA_SERVER,
+                group_id="credit_notification_service",
                 auto_offset_reset="earliest",
                 value_deserializer=lambda x: json.loads(x.decode('utf-8'))
             )
-            logger.info(f"Kafka consumer started for topic: {topic}")
+            await cls._consumer.start()
+            logger.info(f"Async Kafka consumer started for topic: {topic}")
 
     @classmethod
-    def consume(cls, topic):
-        cls.initialize(topic)
+    async def consume(cls, topic):
+        await cls.initialize(topic)
 
         try:
             logger.info("Kafka consumer waiting for messages...")
-            for message in cls._consumer:
+            async for message in cls._consumer:
                 decoded_message = message.value
                 print(decoded_message)
         except Exception as e:
             logger.error(f"Exception in consumer loop: {e}")
         finally:
-            cls.close()
+            await cls.close()
 
     @classmethod
-    def close(cls):
+    async def close(cls):
         if cls._consumer:
-            cls._consumer.close()
+            await cls._consumer.stop()
             cls._consumer = None
