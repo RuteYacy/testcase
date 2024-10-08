@@ -3,7 +3,7 @@ import numpy as np
 from store.transaction_store import get_recent_transactions
 
 
-def process_emotional_data(user_id, primary_emotion, intensity, context):
+def get_credit_limit(user_id, primary_emotion, intensity, context):
     recent_transactions = get_recent_transactions(user_id)
     if not recent_transactions:
         logging.warning(f"No transactions found for user {user_id}")

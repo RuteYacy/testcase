@@ -4,7 +4,7 @@ import logging
 from kafka.admin import NewTopic
 from kafka import KafkaConsumer, KafkaAdminClient
 
-from utils.calculate_credit_limit import process_emotional_data
+from utils.calculate_credit_limit import get_credit_limit
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -59,14 +59,12 @@ async def consume():
             user_id = data.get("user_id")
             primary_emotion = data.get("primary_emotion")
             intensity = data.get("intensity")
-            duration = data.get("duration")
             context = data.get("context")
 
-            final_credit_limit = process_emotional_data(
+            final_credit_limit = get_credit_limit(
                 user_id,
                 primary_emotion,
                 intensity,
-                duration,
                 context,
             )
             print(final_credit_limit)

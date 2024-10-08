@@ -7,7 +7,7 @@ from app.emotional_data.schemas import EmotionalDataInput
 
 from app.kafka_producer.producer import KafkaProducerWrapper, EMOTIONAL_DATA_TOPIC
 
-from app.dependencies import get_auth_user
+from app.core.dependencies import get_auth_user
 from app.core.database import get_db
 from app.users.models import User
 
