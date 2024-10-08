@@ -1,38 +1,42 @@
 import os
 import jwt
-from datetime import datetime, timedelta, timezone
 from typing import Optional
+from datetime import datetime, timedelta, timezone
 
-SECRET_KEY = os.getenv('SECRET_KEY')
 
 # The algorithm to use for signing the JWT tokens
 ALGORITHM = os.getenv("ALGORITHM")
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRET_KEY = os.getenv('SECRET_KEY')
+ACCESS_TOKEN_DURATION = os.getenv('ACCESS_TOKEN_DURATION')
 
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     """
     Function to create a JWT access token.
 
     Returns:
     - encoded_jwt: The JWT token as a string.
     """
-    to_encode = data.copy()  # Make a copy of the data to avoid altering the original
+    try:
+        to_encode = data.copy()  # Make a copy of the data to avoid altering the original
 
-    # If a custom expiration time is provided, use that
-    # Otherwise, use the default expiration time of 30 minutes
-    if expires_delta:
-        expire = datetime.now(tz=timezone.utc) + expires_delta
-    else:
-        expire = datetime.now(tz=timezone.utc) + timedelta(
-            minutes=ACCESS_TOKEN_EXPIRE_MINUTES,
-        )
+        # If a custom expiration time is provided, use that
+        # Otherwise, use the default expiration time of 30 minutes
+        if expires_delta:
+            expire = datetime.now(tz=timezone.utc) + expires_delta
+        else:
+            expire = datetime.now(tz=timezone.utc) + timedelta(
+                hours=int(ACCESS_TOKEN_DURATION),
+            )
 
-    to_encode.update({"exp": expire})
+        to_encode.update({"exp": expire})
 
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+        encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+        return encoded_jwt
+
+    except Exception:
+        raise ValueError("An error occurred while creating the access token")
 
 
 def verify_token(token: str):
@@ -51,3 +55,6 @@ def verify_token(token: str):
 
     except jwt.InvalidTokenError:
         raise ValueError("Invalid token")
+
+    except Exception:
+        raise ValueError("An error occurred while verifying the token")
