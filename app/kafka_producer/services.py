@@ -1,4 +1,3 @@
-from datetime import datetime, timezone
 from app.config import EMOTIONAL_DATA_TOPIC
 
 from app.kafka_producer.producer import KafkaProducerWrapper
@@ -15,7 +14,6 @@ def produce_emotional_data_message(
     message = EmotionalDataMessageSchema(
         data_id=data_id,
         user_id=user_id,
-        timestamp=datetime.now(timezone.utc),
         primary_emotion=primary_emotion,
         intensity=intensity,
         context=context,
