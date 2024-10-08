@@ -9,52 +9,30 @@ def process_emotional_data(user_id, primary_emotion, intensity, duration, contex
         logging.warning(f"No transactions found for user {user_id}")
         return None
 
-    risk_score = calculate_risk_score(
-        user_id,
+    risk_score = predict_risk_score(
         primary_emotion,
-        intensity,
-        duration,
-        context,
         recent_transactions,
     )
 
-    return risk_score
+    base_credit_limit = calculate_base_credit_limit(recent_transactions)
+    final_credit_limit = base_credit_limit * (1 - risk_score)
+
+    return final_credit_limit
 
 
-def calculate_risk_score(
-    user_id,
+def predict_risk_score(
     primary_emotion,
-    intensity,
-    duration,
-    context,
     transactions,
 ):
-    features = {
-        "user_id": user_id,
-        "primary_emotion": primary_emotion,
-        "intensity": intensity,
-        "duration": duration,
-        "context": context,
-        "transaction_history": transactions
-    }
-
-    risk_score = predict_risk_score(features)
-    return risk_score
-
-
-def predict_risk_score(features):
-    # intensity = features.get("intensity", 0)
-    primary_emotion = features.get("primary_emotion", "neutral")
-    transaction_history = features.get("transaction_history", [])
-
+    # intensity
     income_total = sum(
-        [trans["amount"] for trans in transaction_history if trans["amount"] > 0],
+        [trans["amount"] for trans in transactions if trans["amount"] > 0],
     )
     spending_total = sum(
-        [abs(trans["amount"]) for trans in transaction_history if trans["amount"] < 0],
+        [abs(trans["amount"]) for trans in transactions if trans["amount"] < 0],
     )
     balance_fluctuation = np.std(
-        [trans["balance_after_transaction"] for trans in transaction_history],
+        [trans["balance_after_transaction"] for trans in transactions],
     )
 
     if primary_emotion in ["anger", "anxiety", "stress"]:
@@ -72,3 +50,16 @@ def predict_risk_score(features):
     risk_score = max(0, min(risk_score, 1))
 
     return risk_score
+
+
+def calculate_base_credit_limit(transactions):
+    total_income = sum(
+        [trans["amount"] for trans in transactions if trans["amount"] > 0],
+    )
+    total_spending = sum(
+        [abs(trans["amount"]) for trans in transactions if trans["amount"] < 0],
+    )
+
+    base_credit_limit = (total_income / len(transactions)) * 3
+    - (total_spending / len(transactions))
+    return max(base_credit_limit, 0)
