@@ -12,7 +12,7 @@ DB_NAME = os.getenv("DB_NAME", "cwtestcase")
 
 def wait_for_db():
     """
-    Wait until PostgreSQL is available.
+    Wait until PostgreSQL is available to start app.
     """
     connected = False
     while not connected:

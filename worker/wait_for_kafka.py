@@ -8,6 +8,9 @@ BOOTSTRAP_SERVERS = 'kafka:29092'
 
 
 def wait_for_kafka():
+    """
+    Wait until Kafka is available to start worker.
+    """
     max_attempts = 10
     attempt = 0
     while attempt < max_attempts:

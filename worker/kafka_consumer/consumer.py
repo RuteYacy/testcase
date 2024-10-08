@@ -1,5 +1,5 @@
 import json
-import logging
+from config import logger
 
 from kafka.admin import NewTopic
 from kafka import KafkaConsumer, KafkaAdminClient
@@ -8,10 +8,6 @@ from store.user_store import update_credit_limit
 from store.emotional_data_store import update_data_score
 
 from utils.calculate_credit_limit import get_credit_limit
-
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
 
 EMOTIONAL_DATA_TOPIC = 'emotional_data_topic'
 EMOTIONAL_DATA_CLIENT = 'emotional_data_client'
@@ -23,19 +19,20 @@ def ensure_topic_exists():
     try:
         existing_topics = admin_client.list_topics()
 
+        # Check if the specific topic exists, if not, create it
         if EMOTIONAL_DATA_TOPIC not in existing_topics:
-            logging.info(f"Creating topic: {EMOTIONAL_DATA_TOPIC}")
+            logger.info(f"Creating topic: {EMOTIONAL_DATA_TOPIC}")
             topic = NewTopic(
                 name=EMOTIONAL_DATA_TOPIC,
                 num_partitions=1,
                 replication_factor=1
             )
             admin_client.create_topics([topic])
-            logging.info(f"Topic '{EMOTIONAL_DATA_TOPIC}' created successfully.")
+            logger.info(f"Topic '{EMOTIONAL_DATA_TOPIC}' created successfully.")
         else:
-            logging.info(f"Topic '{EMOTIONAL_DATA_TOPIC}' already exists.")
+            logger.error(f"Topic '{EMOTIONAL_DATA_TOPIC}' already exists.")
     except Exception as e:
-        logging.error(f"Error creating topic: {e}")
+        logger.error(f"Error creating topic: {e}")
     finally:
         admin_client.close()
 
@@ -53,10 +50,10 @@ async def consume():
     )
 
     try:
-        logging.info("Kafka consumer started and waiting for messages...")
+        logger.info("Kafka consumer started and waiting for messages...")
         for message in consumer:
             decoded_message = message.value
-            logging.info(f"Received message: {decoded_message}")
+            logger.info(f"Received message: {decoded_message}")
 
             data = decoded_message.get("data", {})
             data_id = data.get("data_id")
@@ -65,16 +62,18 @@ async def consume():
             intensity = data.get("intensity")
             context = data.get("context")
 
+            # Calculate the risk score and final credit limit based on message data
             risk_score, final_credit_limit = get_credit_limit(
                 user_id,
                 primary_emotion,
                 intensity,
                 context,
             )
+            # Update the user’s credit limit and the data score in the store
             await update_credit_limit(user_id, final_credit_limit)
             await update_data_score(data_id, risk_score, final_credit_limit)
     except Exception as e:
-        logging.error(f"Exception in consumer loop: {e}")
+        logger.error(f"Exception in consumer loop: {e}")
     finally:
         consumer.close()
-        logging.info('Kafka consumer stopped')
+        logger.info('Kafka consumer stopped')
