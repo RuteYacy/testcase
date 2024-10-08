@@ -52,15 +52,14 @@ async def consume():
     try:
         logger.info("Kafka consumer started and waiting for messages...")
         for message in consumer:
-            decoded_message = message.value
+            decoded_message = json.loads(message.value)
             logger.info(f"Received message: {decoded_message}")
 
-            data = decoded_message.get("data", {})
-            data_id = data.get("data_id")
-            user_id = data.get("user_id")
-            primary_emotion = data.get("primary_emotion")
-            intensity = data.get("intensity")
-            context = data.get("context")
+            data_id = decoded_message.get("data_id")
+            user_id = decoded_message.get("user_id")
+            primary_emotion = decoded_message.get("primary_emotion")
+            intensity = decoded_message.get("intensity")
+            context = decoded_message.get("context")
 
             # Calculate the risk score and final credit limit based on message data
             risk_score, final_credit_limit = get_credit_limit(
