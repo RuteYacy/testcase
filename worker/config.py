@@ -6,3 +6,9 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+
+KAFKA_SERVER = 'kafka:29092'
+EMOTIONAL_DATA_CLIENT = 'emotional_data_client'
+
+CREDIT_LIMIT_UPDATE_TOPIC = 'credit_limit_topic'
+EMOTIONAL_DATA_TOPIC = 'emotional_data_topic'
