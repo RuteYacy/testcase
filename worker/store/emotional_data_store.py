@@ -10,9 +10,10 @@ logging.basicConfig(
 )
 
 
-async def update_processed_score(
+async def update_data_score(
     emotional_data_id: int,
-    processed_score: float,
+    risk_score: float,
+    processed_limit: float,
 ):
     db = next(get_db())
     try:
@@ -21,7 +22,8 @@ async def update_processed_score(
         emotional_data = result.scalar_one_or_none()
 
         if emotional_data:
-            emotional_data.processed_score = processed_score
+            emotional_data.risk_score = risk_score
+            emotional_data.processed_limit = processed_limit
             db.commit()
         else:
             logging.warning(f"EmotionalData with ID {emotional_data_id} not found.")

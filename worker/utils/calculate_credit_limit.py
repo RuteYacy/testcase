@@ -14,7 +14,7 @@ def get_credit_limit(user_id, primary_emotion, intensity, context):
 
     final_credit_limit = base_credit_limit * (1 - risk_score)
 
-    return final_credit_limit
+    return risk_score, final_credit_limit
 
 
 def predict_risk_score(primary_emotion, intensity, transactions):

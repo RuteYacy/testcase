@@ -5,7 +5,7 @@ from kafka.admin import NewTopic
 from kafka import KafkaConsumer, KafkaAdminClient
 
 from store.user_store import update_credit_limit
-from store.emotional_data_store import update_processed_score
+from store.emotional_data_store import update_data_score
 
 from utils.calculate_credit_limit import get_credit_limit
 
@@ -65,14 +65,14 @@ async def consume():
             intensity = data.get("intensity")
             context = data.get("context")
 
-            final_credit_limit = get_credit_limit(
+            risk_score, final_credit_limit = get_credit_limit(
                 user_id,
                 primary_emotion,
                 intensity,
                 context,
             )
             await update_credit_limit(user_id, final_credit_limit)
-            await update_processed_score(data_id, final_credit_limit)
+            await update_data_score(data_id, risk_score, final_credit_limit)
     except Exception as e:
         logging.error(f"Exception in consumer loop: {e}")
     finally:
