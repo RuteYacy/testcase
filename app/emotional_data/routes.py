@@ -1,3 +1,5 @@
+from app.config import logger
+
 from datetime import datetime
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends
@@ -53,7 +55,7 @@ async def send_emotional_data(
     try:
         KafkaProducerWrapper.produce(topic=EMOTIONAL_DATA_TOPIC, value={"data": data})
     except Exception as e:
-        print(f"Failed to send message to Kafka: {e}")
+        logger.error(f"Failed to send message to Kafka: {e}")
 
     return {
         "message": "Emotional data successfully stored and sent to Kafka",

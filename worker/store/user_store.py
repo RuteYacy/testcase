@@ -1,12 +1,8 @@
-import logging
+from config import logger
 from datetime import datetime, timezone
 
 from models.user import User
 from database import get_db
-
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
 
 
 async def update_credit_limit(user_id, new_credit_limit):
@@ -27,13 +23,13 @@ async def update_credit_limit(user_id, new_credit_limit):
                 user.approved_date = None
 
             db.commit()
-            logging.info(f"Credit limit updated for user {user_id} to {new_credit_limit}")
+            logger.info(f"Credit limit updated for user {user_id} to {new_credit_limit}")
 
         else:
-            logging.warning(f"User with ID {user_id} not found.")
+            logger.info(f"User with ID {user_id} not found.")
 
     except Exception as e:
-        logging.error(f"Error updating credit limit for user {user_id}: {e}")
+        logger.info(f"Error updating credit limit for user {user_id}: {e}")
         db.rollback()
 
     finally:

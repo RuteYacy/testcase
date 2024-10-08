@@ -5,10 +5,6 @@ from sqlalchemy.future import select
 
 from models.emotional_data import EmotionalData
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-
 
 async def update_data_score(
     emotional_data_id: int,

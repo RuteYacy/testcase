@@ -1,10 +1,6 @@
 import json
-import logging
+from app.config import logger
 from kafka import KafkaProducer
-
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
 
 EMOTIONAL_DATA_TOPIC = 'emotional_data_topic'
 EMOTIONAL_DATA_CLIENT = 'emotional_data_client'
@@ -22,7 +18,7 @@ class KafkaProducerWrapper:
                 # Serialize data to JSON format
                 value_serializer=lambda v: json.dumps(v).encode('utf-8')
             )
-            logging.info("Kafka producer started")
+            logger.info("Kafka producer started")
 
     @classmethod
     def produce(cls, topic, value):
@@ -32,9 +28,9 @@ class KafkaProducerWrapper:
             # Send the message to the specified Kafka topic and flush the producer buffer
             cls._producer.send(topic, value=value)
             cls._producer.flush()
-            logging.info("Message sent to Kafka")
+            logger.info("Message sent to Kafka")
         except Exception as err:
-            logging.error(f"Kafka producer error: {err}")
+            logger.error(f"Kafka producer error: {err}")
 
     @classmethod
     def close(cls):
