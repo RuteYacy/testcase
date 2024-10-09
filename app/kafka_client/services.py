@@ -2,8 +2,8 @@ import json
 from fastapi import HTTPException, status
 from app.config import logger, EMOTIONAL_DATA_TOPIC
 
-from app.kafka_producer.producer import KafkaProducerWrapper
-from app.kafka_producer.schemas import EmotionalDataMessageSchema
+from app.kafka_client.producer import KafkaProducerWrapper
+from app.kafka_client.schemas import EmotionalDataMessageSchema
 
 
 def produce_emotional_data_message(

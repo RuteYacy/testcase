@@ -4,20 +4,20 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.users.models import User
 from app.core.dependencies import get_auth_user
 
-from app.kafka_producer.schemas import EmotionalDataRequest
-from app.kafka_producer.services import produce_emotional_data_message
+from app.kafka_client.schemas import EmotionalDataRequest
+from app.kafka_client.services import produce_emotional_data_message
 
 
 router = APIRouter(
-    prefix="/kafka-producer",
-    tags=["kafka-producer"],
+    prefix="/kafka",
+    tags=["kafka"],
 )
 
 
 @router.post("/send-emotional-data",
              response_model=dict,
              status_code=status.HTTP_202_ACCEPTED)
-async def send_emotional_data(
+def send_emotional_data(
     data: EmotionalDataRequest,
     current_user: User = Depends(get_auth_user),
 ):

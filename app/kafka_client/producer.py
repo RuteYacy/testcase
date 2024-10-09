@@ -11,7 +11,6 @@ class KafkaProducerWrapper:
         if cls._producer is None:
             cls._producer = KafkaProducer(
                 bootstrap_servers=KAFKA_SERVER,
-                # Serialize data to JSON format
                 value_serializer=lambda v: json.dumps(v).encode('utf-8')
             )
             logger.info("Kafka producer started")
@@ -21,10 +20,9 @@ class KafkaProducerWrapper:
         if cls._producer is None:
             cls.initialize()
         try:
-            # Send the message to the specified Kafka topic and flush the producer buffer
             cls._producer.send(topic, value=value)
             cls._producer.flush()
-            logger.info("Message sent to Kafka")
+            logger.info(f"Message sent to Kafka topic: {topic}")
         except Exception as err:
             logger.error(f"Kafka producer error: {err}")
 

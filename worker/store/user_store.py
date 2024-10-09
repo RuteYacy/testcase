@@ -5,7 +5,7 @@ from models.user import User
 from database import get_db
 
 
-async def update_credit_limit(user_id, new_credit_limit):
+def update_credit_limit(user_id, new_credit_limit):
     db = next(get_db())
     try:
         # Query the user by user_id
