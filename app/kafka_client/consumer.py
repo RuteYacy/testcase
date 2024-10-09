@@ -1,7 +1,9 @@
 import json
 import asyncio
-from app.config import logger, KAFKA_SERVER
+import threading
+from app.config import logger, KAFKA_SERVER, CREDIT_LIMIT_UPDATE_TOPIC
 from kafka import KafkaConsumer
+
 
 class KafkaConsumerWrapper:
     _consumer = None
@@ -35,7 +37,23 @@ class KafkaConsumerWrapper:
             cls.close()
 
     @classmethod
-    def close(cls):
+    async def close(cls):
         if cls._consumer:
             cls._consumer.close()
             cls._consumer = None
+
+
+def start_consumer_thread():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    loop.run_until_complete(
+        KafkaConsumerWrapper.consume(CREDIT_LIMIT_UPDATE_TOPIC),
+    )
+
+
+def run_kafka_in_background():
+    consumer_thread = threading.Thread(
+        target=start_consumer_thread, daemon=True,
+    )
+    consumer_thread.start()
