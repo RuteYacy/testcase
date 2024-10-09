@@ -28,9 +28,9 @@ class KafkaConsumerWrapper:
         try:
             logger.info("Kafka consumer waiting for messages...")
             for message in cls._consumer:
+                print(message)
                 decoded_message = message.value
                 print(decoded_message)
-                await asyncio.sleep(0)
         except Exception as e:
             logger.error(f"Exception in consumer loop: {e}")
         finally:
@@ -44,12 +44,15 @@ class KafkaConsumerWrapper:
 
 
 def start_consumer_thread():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-
-    loop.run_until_complete(
-        KafkaConsumerWrapper.consume(CREDIT_LIMIT_UPDATE_TOPIC),
-    )
+    try:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        logger.info("Kafka consumer thread started")
+        loop.run_until_complete(KafkaConsumerWrapper.consume(CREDIT_LIMIT_UPDATE_TOPIC))
+    except Exception as e:
+        logger.error(f"Error in Kafka consumer thread: {e}")
+    finally:
+        logger.info("Kafka consumer thread finished")
 
 
 def run_kafka_in_background():
