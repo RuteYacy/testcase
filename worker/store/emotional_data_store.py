@@ -6,7 +6,7 @@ from sqlalchemy.future import select
 from models.emotional_data import EmotionalData
 
 
-async def update_data_score(
+def update_data_score(
     emotional_data_id: int,
     risk_score: float,
     processed_limit: float,
