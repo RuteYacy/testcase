@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.users.models import User
 from app.core.dependencies import get_auth_user
 
-from app.kafka.schemas import EmotionalDataRequest
-from app.kafka.services import produce_emotional_data_message
+from app.kafka_client.schemas import EmotionalDataRequest
+from app.kafka_client.services import produce_emotional_data_message
 
 
 router = APIRouter(
@@ -17,7 +17,7 @@ router = APIRouter(
 @router.post("/send-emotional-data",
              response_model=dict,
              status_code=status.HTTP_202_ACCEPTED)
-async def send_emotional_data(
+def send_emotional_data(
     data: EmotionalDataRequest,
     current_user: User = Depends(get_auth_user),
 ):
@@ -34,7 +34,7 @@ async def send_emotional_data(
         )
 
     try:
-        await produce_emotional_data_message(
+        produce_emotional_data_message(
             data_id=data.data_id,
             user_id=current_user.id,
             primary_emotion=data.primary_emotion,

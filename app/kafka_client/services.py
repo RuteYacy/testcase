@@ -2,11 +2,11 @@ import json
 from fastapi import HTTPException, status
 from app.config import logger, EMOTIONAL_DATA_TOPIC
 
-from app.kafka.producer import KafkaProducer
-from app.kafka.schemas import EmotionalDataMessageSchema
+from app.kafka_client.producer import KafkaProducerWrapper
+from app.kafka_client.schemas import EmotionalDataMessageSchema
 
 
-async def produce_emotional_data_message(
+def produce_emotional_data_message(
     data_id,
     user_id,
     primary_emotion,
@@ -24,7 +24,7 @@ async def produce_emotional_data_message(
 
         serialized_message = message.model_dump_json()
 
-        await KafkaProducer.produce(
+        KafkaProducerWrapper.produce(
             topic=EMOTIONAL_DATA_TOPIC,
             value=serialized_message,
         )
