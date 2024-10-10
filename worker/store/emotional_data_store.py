@@ -20,8 +20,8 @@ def update_data_score(
 
         # If the record is found, update the risk_score and processed_limit fields
         if emotional_data:
-            emotional_data.risk_score = risk_score
-            emotional_data.processed_limit = processed_limit
+            emotional_data.risk_score = float(risk_score)
+            emotional_data.processed_limit = float(processed_limit)
             db.commit()
         else:
             logging.warning(f"EmotionalData with ID {emotional_data_id} not found.")
@@ -32,3 +32,6 @@ def update_data_score(
         )
         # Roll back the transaction if an error occurs
         db.rollback()
+
+    finally:
+        db.close()

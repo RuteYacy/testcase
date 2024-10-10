@@ -4,8 +4,9 @@ from config import logger, KAFKA_SERVER, EMOTIONAL_DATA_CLIENT, CREDIT_LIMIT_UPD
 
 from store.user_store import update_credit_limit
 from store.emotional_data_store import update_data_score
-from ml_engine.credit_analysis import get_credit_limit
+from store.transaction_store import get_recent_transactions
 
+from ml_engine.predict_risk_score import predict_risk_score
 from kafka_client.producer import KafkaProducerWrapper
 
 
@@ -25,7 +26,7 @@ class KafkaConsumerWrapper:
             logger.info(f"Kafka consumer started for topic: {topic}")
 
     @classmethod
-    def consume(cls, topic):
+    def consume(cls, topic, ml_model):
         cls.initialize(topic)
 
         try:
@@ -41,20 +42,21 @@ class KafkaConsumerWrapper:
                 user_id = decoded_message.get("user_id")
                 primary_emotion = decoded_message.get("primary_emotion")
                 intensity = decoded_message.get("intensity")
-                context = decoded_message.get("context")
 
-                risk_score, final_credit_limit = get_credit_limit(
-                    user_id,
+                risk_score, final_credit_limit = predict_risk_score(
                     primary_emotion,
                     intensity,
-                    context,
+                    get_recent_transactions(user_id),
+                    ml_model
                 )
 
                 update_credit_limit(user_id, final_credit_limit)
                 update_data_score(data_id, risk_score, final_credit_limit)
 
                 serialized_message = json.dumps({
-                    "message": "Worker is done processing"
+                    "user_id": user_id,
+                    "message": "Worker is done processing",
+                    "risk_score": risk_score
                 })
 
                 KafkaProducerWrapper.produce(
