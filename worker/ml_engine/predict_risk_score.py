@@ -40,6 +40,7 @@ def predict_risk_score(primary_emotion, intensity, transactions, model):
 
     risk_score = model.predict(features)[0]
     risk_score = max(0, min(risk_score, 1))  # Ensure risk_score is between 0 and 1
+    risk_score = round(risk_score, 2)
 
     base_credit_limit = calculate_base_credit_limit(
         total_income,
@@ -50,6 +51,7 @@ def predict_risk_score(primary_emotion, intensity, transactions, model):
 
     # Adjust the final credit limit based on the risk score
     final_credit_limit = base_credit_limit * (1 - risk_score)
+    final_credit_limit = round(final_credit_limit, 2)
 
     return risk_score, final_credit_limit
 
