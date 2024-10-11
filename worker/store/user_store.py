@@ -12,7 +12,8 @@ def update_credit_limit(user_id, new_credit_limit):
         user = db.query(User).filter(User.id == user_id).first()
 
         if user:
-            user.credit_limit = new_credit_limit
+            # Convert np.float64 to float before assigning to user.credit_limit
+            user.credit_limit = float(new_credit_limit)
 
             # Set the approved or denied date based on the new credit limit value
             if new_credit_limit > 0:
@@ -29,7 +30,7 @@ def update_credit_limit(user_id, new_credit_limit):
             logger.info(f"User with ID {user_id} not found.")
 
     except Exception as e:
-        logger.info(f"Error updating credit limit for user {user_id}: {e}")
+        logger.error(f"Error updating credit limit for user {user_id}: {e}")
         db.rollback()
 
     finally:
