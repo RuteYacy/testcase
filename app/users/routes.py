@@ -3,6 +3,7 @@ from typing import List
 
 from datetime import timedelta
 from sqlalchemy.orm import Session
+from email_validator import validate_email, EmailNotValidError
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 from app.users.models import User
@@ -26,7 +27,7 @@ ACCESS_TOKEN_DURATION = os.getenv('ACCESS_TOKEN_DURATION')
 REFRESH_TOKEN_DURATION = os.getenv('REFRESH_TOKEN_DURATION')
 
 
-@router.get("/users", response_model=List[UserSchema])
+@router.get("/", response_model=List[UserSchema])
 def get_users(db: Session = Depends(get_db)):
     """
     Get a list of all users.
@@ -53,6 +54,16 @@ def signup(user: UserSignUp, request: Request, db: Session = Depends(get_db)):
     - A dictionary containing access and refresh tokens, and user details.
     """
     try:
+        # Validate the email format
+        try:
+            valid_email = validate_email(user.email)
+            user.email = valid_email.email
+        except EmailNotValidError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid email address: {str(e)}",
+            )
+
         # Check if a user with the given email already exists
         user_in_db = db.query(User).filter(User.email == user.email).first()
         if user_in_db:
