@@ -8,7 +8,7 @@ class CreditLimitSchema(BaseModel):
     created_at: datetime
     risk_score: float
     credit_limit: float
-    emotion_id: int
+    emotional_data_id: int
     primary_emotion: str
 
     model_config = {
