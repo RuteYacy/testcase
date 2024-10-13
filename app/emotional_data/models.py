@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
-from sqlalchemy import Column, Integer, Float, DateTime, String, ForeignKey
+from sqlalchemy import (Column, Integer, Float, DateTime,
+                        String, ForeignKey, CheckConstraint)
 
 from app.core.database import Base
 
@@ -14,3 +15,11 @@ class EmotionalData(Base):
     primary_emotion = Column(String, nullable=True)
     intensity = Column(Float, nullable=True)
     context = Column(String, nullable=True)
+
+    __table_args__ = (
+        CheckConstraint(
+            "primary_emotion IN ('anger', 'anxiety', 'stress', 'happiness', " +
+            "'calm', 'neutral', 'sadness', 'fear', 'surprise')",
+            name="valid_primary_emotion"
+        ),
+    )

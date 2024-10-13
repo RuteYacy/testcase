@@ -1,18 +1,11 @@
 from pydantic import BaseModel
 from typing import Optional
-
-
-class EmotionalDataRequest(BaseModel):
-    data_id: int
-    user_id: int
-    primary_emotion: str
-    intensity: float
-    context: str
+from app.emotional_data.schemas import PrimaryEmotionEnum
 
 
 class EmotionalDataMessageSchema(BaseModel):
     data_id: int
     user_id: int
-    primary_emotion: str
+    primary_emotion: PrimaryEmotionEnum
     intensity: float
     context: Optional[str] = None
