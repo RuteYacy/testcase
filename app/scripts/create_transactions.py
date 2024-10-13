@@ -15,7 +15,7 @@ user_id = 1
 
 def create_random_transactions(user_id):
     transaction_types = ['deposit', 'withdrawal', 'transfer', 'payment']
-    categories = ['food', 'entertainment', 'groceries', 'rent', 'utilities', 'salary', 'investment', None]
+    categories = ['food', 'entertainment', 'food', 'home', 'other', 'personal', 'transport', None]
 
     for _ in range(8):
         transaction_type = random.choice(transaction_types)
