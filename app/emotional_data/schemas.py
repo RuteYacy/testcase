@@ -17,4 +17,4 @@ class PrimaryEmotionEnum(str, Enum):
 class EmotionalDataInput(BaseModel):
     primary_emotion: PrimaryEmotionEnum
     intensity: float = Field(..., ge=0, le=1)
-    context: str
+    context: str = None
