@@ -3,7 +3,7 @@ from kafka import KafkaConsumer
 from config import logger, KAFKA_SERVER, EMOTIONAL_DATA_CLIENT, CREDIT_LIMIT_UPDATE_TOPIC
 
 from store.user_store import update_credit_limit
-from store.emotional_data_store import update_data_score
+from store.credit_limit import update_data_score
 from store.transaction_store import get_recent_transactions
 
 from ml_engine.predict_risk_score import predict_risk_score

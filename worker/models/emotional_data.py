@@ -14,6 +14,3 @@ class EmotionalData(Base):
     primary_emotion = Column(String, nullable=True)
     intensity = Column(Float, nullable=True)
     context = Column(String, nullable=True)
-
-    risk_score = Column(Float, nullable=True)
-    processed_limit = Column(Float, nullable=True)
