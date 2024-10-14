@@ -28,7 +28,7 @@ def get_auth_user(db: Session = Depends(get_db), token: str = Depends(api_key_he
             raise credentials_exception
 
         payload = jwt.decode(
-            token, os.getenv("SECRET_KEY"),
+            token, os.getenv("KEY"),
             algorithms=[os.getenv("ALGORITHM")],
         )
         # Extract the user email from the token payload.

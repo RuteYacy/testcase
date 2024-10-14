@@ -56,7 +56,8 @@ class KafkaConsumerWrapper:
                 serialized_message = json.dumps({
                     "user_id": user_id,
                     "message": "Worker is done processing",
-                    "risk_score": risk_score
+                    "risk_score": risk_score,
+                    "credit_limit": final_credit_limit
                 })
 
                 KafkaProducerWrapper.produce(

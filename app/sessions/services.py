@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, timezone
 # The algorithm to use for signing the JWT tokens
 ALGORITHM = os.getenv("ALGORITHM")
 
-SECRET_KEY = os.getenv('SECRET_KEY')
+KEY = os.getenv('KEY')
 ACCESS_TOKEN_DURATION = os.getenv('ACCESS_TOKEN_DURATION')
 
 
@@ -32,7 +32,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
 
         to_encode.update({"exp": expire})
 
-        encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+        encoded_jwt = jwt.encode(to_encode, KEY, algorithm=ALGORITHM)
         return encoded_jwt
 
     except Exception:
@@ -47,7 +47,7 @@ def verify_token(token: str):
     - payload: The decoded data from the token if it is valid.
     """
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, KEY, algorithms=[ALGORITHM])
         return payload
 
     except jwt.ExpiredSignatureError:
