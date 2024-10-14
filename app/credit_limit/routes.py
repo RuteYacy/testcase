@@ -85,3 +85,38 @@ async def get_monthly_credit_limit(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred while retrieving the credit limit history."
         )
+
+
+@router.get("/by-emotion/{emotional_data_id}",
+            response_model=CreditLimitSchema,
+            status_code=status.HTTP_200_OK)
+def get_credit_limit_by_emotion(
+    emotional_data_id: int,
+    current_user: User = Depends(get_auth_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Retrieves a credit limit entry for the user based on the emotional data ID.
+    """
+    try:
+        credit_limit = (
+            db.query(CreditLimit)
+            .filter(CreditLimit.user_id == current_user.id,
+                    CreditLimit.emotional_data_id == emotional_data_id)
+            .order_by(CreditLimit.created_at.desc())
+            .first()
+        )
+
+        if not credit_limit:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"No credit limit found for the data ID {emotional_data_id}."
+            )
+
+        return credit_limit
+
+    except SQLAlchemyError:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error occurred while retrieving the credit limit for data ID."
+        )
