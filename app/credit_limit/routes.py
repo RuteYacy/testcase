@@ -13,8 +13,8 @@ from app.credit_limit.schemas import CreditLimitSchema
 
 
 router = APIRouter(
-    prefix="/credit-history",
-    tags=["credit-history"],
+    prefix="/credit-limit",
+    tags=["credit-limit"],
 )
 
 
@@ -87,7 +87,7 @@ async def get_monthly_credit_limit(
         )
 
 
-@router.get("/by-emotion/{emotional_data_id}",
+@router.get("/emotion/{emotional_data_id}",
             response_model=CreditLimitSchema,
             status_code=status.HTTP_200_OK)
 def get_credit_limit_by_emotion(
