@@ -8,13 +8,15 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 from app.users.models import User
 from app.users.crud import create_user
+from app.users.services import verify_password
 from app.users.schemas import UserSchema, UserSignUp, UserSignIn, UserResponse
 
+from app.sessions.models import Sessions
 from app.sessions.crud import create_session
 from app.sessions.services import create_access_token
 
 from app.core.database import get_db
-from app.users.services import verify_password
+from app.core.dependencies import get_auth_user
 
 
 router = APIRouter(
@@ -166,6 +168,44 @@ def signin(user: UserSignIn, request: Request, db: Session = Depends(get_db)):
             access_token=access_token,
             refresh_token=refresh_token
         )
+
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        )
+
+
+@router.post("/signout", status_code=status.HTTP_200_OK)
+def signout(
+    current_user: User = Depends(get_auth_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Sign out the current authenticated user by removing their last session.
+
+    Returns:
+    - A success message if the session is successfully removed.
+    """
+    try:
+        # Find the latest session for the authenticated user
+        session = db.query(Sessions)\
+                    .filter(Sessions.user_id == current_user.id)\
+                    .order_by(Sessions.created_at.desc())\
+                    .first()
+
+        if not session:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Session not found",
+            )
+
+        db.delete(session)
+        db.commit()
+
+        return {"message": "User successfully signed out"}
 
     except HTTPException as e:
         raise e
