@@ -7,7 +7,7 @@ from app.kafka_client.schemas import EmotionalDataMessageSchema
 
 
 def produce_emotional_data_message(
-    data_id,
+    id,
     user_id,
     primary_emotion,
     intensity,
@@ -15,7 +15,7 @@ def produce_emotional_data_message(
 ):
     try:
         message = EmotionalDataMessageSchema(
-            data_id=data_id,
+            id=id,
             user_id=user_id,
             primary_emotion=primary_emotion,
             intensity=intensity,

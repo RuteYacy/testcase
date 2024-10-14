@@ -1,8 +1,11 @@
 import json
 import asyncio
 import threading
-from app.config import logger, KAFKA_SERVER, CREDIT_LIMIT_UPDATE_TOPIC
+
 from kafka import KafkaConsumer
+from app.config import logger, KAFKA_SERVER, CREDIT_LIMIT_UPDATE_TOPIC
+
+from app.ws.client import WebSocketClient
 
 
 class KafkaConsumerWrapper:
@@ -30,7 +33,7 @@ class KafkaConsumerWrapper:
             for message in cls._consumer:
                 print(message)
                 decoded_message = message.value
-                print(decoded_message)
+                await WebSocketClient.broadcast_message(decoded_message)
         except Exception as e:
             logger.error(f"Exception in consumer loop: {e}")
         finally:
