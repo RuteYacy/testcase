@@ -35,7 +35,7 @@ def send_emotional_data(
 
     try:
         produce_emotional_data_message(
-            data_id=data.data_id,
+            id=data.id,
             user_id=current_user.id,
             primary_emotion=data.primary_emotion,
             intensity=data.intensity,

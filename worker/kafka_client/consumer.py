@@ -38,7 +38,7 @@ class KafkaConsumerWrapper:
                     logger.error(f"JSON decode error: {json_err}")
                     continue
 
-                data_id = decoded_message.get("data_id")
+                id = decoded_message.get("id")
                 user_id = decoded_message.get("user_id")
                 primary_emotion = decoded_message.get("primary_emotion")
                 intensity = decoded_message.get("intensity")
@@ -51,7 +51,7 @@ class KafkaConsumerWrapper:
                 )
 
                 update_credit_limit(user_id, final_credit_limit)
-                update_data_score(data_id, risk_score, final_credit_limit)
+                update_data_score(id, risk_score, final_credit_limit)
 
                 serialized_message = json.dumps({
                     "user_id": user_id,
