@@ -20,6 +20,7 @@ def create_user(db: Session, user: UserSignUp):
         hashed_password = get_password_hash(user.password)
 
         db_user = User(
+            name=user.name,
             email=user.email,
             password=hashed_password,
         )
