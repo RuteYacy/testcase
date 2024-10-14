@@ -10,6 +10,7 @@ from app.emotional_data.routes import router as emotional_data_router
 from app.kafka_client.routes import router as kafka_router
 from app.transaction_history.routes import router as transaction_history_router
 from app.credit_limit.routes import router as credit_limit_router
+from app.ws.routes import router as ws_router
 
 
 @asynccontextmanager
@@ -31,6 +32,7 @@ app.include_router(emotional_data_router)
 app.include_router(kafka_router)
 app.include_router(transaction_history_router)
 app.include_router(credit_limit_router)
+app.include_router(ws_router)
 
 
 @app.get("/")
