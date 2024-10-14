@@ -73,10 +73,7 @@ async def get_monthly_credit_limit(
         ).order_by(CreditLimit.created_at.desc()).all()
 
         if not credit_limits:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="No credit limit history found for the specified month and year."
-            )
+            return []
 
         return credit_limits
 

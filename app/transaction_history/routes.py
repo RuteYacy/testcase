@@ -73,10 +73,7 @@ async def get_monthly_transaction_history(
         ).order_by(TransactionHistory.created_at.desc()).all()
 
         if not transactions:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="No transaction history found for the specified month and year."
-            )
+            return []
 
         return transactions
 
