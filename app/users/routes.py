@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 
 from app.users.models import User
 from app.users.crud import create_user
-from app.users.schemas import UserSchema, UserSignUp, UserSignIn
+from app.users.schemas import UserSchema, UserSignUp, UserSignIn, UserResponse
 
 from app.sessions.crud import create_session
 from app.sessions.services import create_access_token
@@ -45,13 +45,13 @@ def get_users(db: Session = Depends(get_db)):
         )
 
 
-@router.post("/signup", response_model=dict)
+@router.post("/signup", response_model=UserResponse)
 def signup(user: UserSignUp, request: Request, db: Session = Depends(get_db)):
     """
     Sign up a new user by registering it in the database.
 
     Returns:
-    - A dictionary containing access and refresh tokens, and user details.
+    - A UserResponse object containing access and refresh tokens, and user details.
     """
     try:
         # Validate the email format
@@ -101,11 +101,11 @@ def signup(user: UserSignUp, request: Request, db: Session = Depends(get_db)):
 
         user_response = UserSchema.model_validate(new_user)
 
-        return {
-            "access_token": access_token,
-            "refresh_token": refresh_token,
-            "user": user_response,
-        }
+        return UserResponse(
+            user=user_response,
+            access_token=access_token,
+            refresh_token=refresh_token
+        )
 
     except HTTPException as e:
         raise e
@@ -116,13 +116,13 @@ def signup(user: UserSignUp, request: Request, db: Session = Depends(get_db)):
         )
 
 
-@router.post("/signin", response_model=dict)
+@router.post("/signin", response_model=UserResponse)
 def signin(user: UserSignIn, request: Request, db: Session = Depends(get_db)):
     """
     Sign in an existing user by verifying their email and password.
 
     Returns:
-    - A dictionary containing access and refresh tokens.
+    - A UserResponse object containing access and refresh tokens, and user details.
     """
     try:
         # Check if a user with the given email exists in the database
@@ -159,10 +159,44 @@ def signin(user: UserSignIn, request: Request, db: Session = Depends(get_db)):
             refresh_token_expires=refresh_token_expires
         )
 
-        return {
-            "access_token": access_token,
-            "refresh_token": refresh_token,
-        }
+        user_response = UserSchema.model_validate(user_in_db)
+
+        return UserResponse(
+            user=user_response,
+            access_token=access_token,
+            refresh_token=refresh_token
+        )
+
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        )
+
+
+@router.get("/{user_id}", response_model=UserSchema)
+def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
+    """
+    Get a user by their ID.
+
+    Returns:
+    - A UserSchema object.
+    """
+    try:
+        # Query the database for the user by ID
+        user = db.query(User).filter(User.id == user_id).first()
+
+        # If the user is not found, raise a 404 error
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found",
+            )
+
+        # Return the user details
+        return UserSchema.model_validate(user)
 
     except HTTPException as e:
         raise e

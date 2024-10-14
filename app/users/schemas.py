@@ -4,14 +4,13 @@ from datetime import date
 
 
 class UserSchema(BaseModel):
-    id: Optional[int] = None
+    id: int
+    name: str
     email: str
     approved_date: Optional[date] = None
     denied_date: Optional[date] = None
-    credit_limit: Optional[int] = None
-    interest_rate: Optional[float] = None
-    loan_term: Optional[int] = None
-    score: Optional[int] = None
+    credit_limit: Optional[float] = None
+    balance: Optional[float] = None
 
     model_config = {
         "from_attributes": True
@@ -26,3 +25,13 @@ class UserSignUp(BaseModel):
 class UserSignIn(BaseModel):
     email: str
     password: str
+
+
+class UserResponse(BaseModel):
+    user: UserSchema
+    access_token: str
+    refresh_token: Optional[str] = None
+
+    model_config = {
+        "from_attributes": True
+    }

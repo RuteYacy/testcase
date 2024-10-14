@@ -28,12 +28,10 @@ def create_user(email, password):
     try:
         hashed_password = get_password_hash(password)
         new_user = User(
+            name='John Doe',
             email=email,
             password=hashed_password,
             approved_date=datetime.now(),
-            credit_limit=5000,
-            interest_rate=3.5,
-            loan_term=36
         )
 
         session.add(new_user)
@@ -119,6 +117,8 @@ def create_credit_limit(user_id, transactions, emotional_data):
     Create rows for the credit_limit table using calculated risk_score and credit_limit.
     """
     try:
+        latest_credit_limit = None
+
         for emotional_record in emotional_data:
             primary_emotion = emotional_record.primary_emotion
             intensity = emotional_record.intensity
@@ -139,9 +139,34 @@ def create_credit_limit(user_id, transactions, emotional_data):
             )
 
             session.add(new_credit_limit)
+            latest_credit_limit = final_credit_limit
 
         session.commit()
         print(f"Credit limits created successfully for user {user_id}.")
+
+        # Update the user's credit limit and balance
+        user = session.query(User).filter(User.id == user_id).first()
+
+        if latest_credit_limit is not None:
+            user.credit_limit = latest_credit_limit
+
+            # Calculate the user's balance based on the latest transactions
+            latest_transaction = transactions[-1]
+            user.balance = latest_transaction.balance_after_transaction
+
+            # Set approved_date or denied_date based on the credit limit value
+            if latest_credit_limit > 0:
+                user.approved_date = datetime.now()
+                user.denied_date = None
+            else:
+                user.denied_date = datetime.now()
+                user.approved_date = None
+
+            session.commit()
+            print(f"User {user_id} updated with credit limit and balance.")
+        else:
+            print(f"No valid credit limit calculated for user {user_id}.")
+
     except SQLAlchemyError as e:
         print(f"Error occurred while creating credit limits: {str(e)}")
         session.rollback()
