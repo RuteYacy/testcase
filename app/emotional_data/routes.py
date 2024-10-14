@@ -45,7 +45,7 @@ async def save_emotional_data(
         db.refresh(new_emotional_data)
 
         return {
-            "data_id": new_emotional_data.id,
+            "id": new_emotional_data.id,
             "user_id": current_user.id,
             "primary_emotion": emotion_data.primary_emotion,
             "intensity": emotion_data.intensity,
@@ -97,7 +97,7 @@ async def get_monthly_emotional_data(
 
         return [
             {
-                "data_id": entry.id,
+                "id": entry.id,
                 "user_id": entry.user_id,
                 "timestamp": entry.timestamp,
                 "primary_emotion": entry.primary_emotion,
