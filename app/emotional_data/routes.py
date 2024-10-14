@@ -66,7 +66,7 @@ async def save_emotional_data(
         )
 
 
-@router.get("/monthly-emotional-data",
+@router.get("/monthly",
             response_model=List[dict],
             status_code=status.HTTP_200_OK)
 async def get_monthly_emotional_data(

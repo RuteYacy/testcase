@@ -56,14 +56,14 @@ def create_transactions(user_id):
 
     try:
         for _ in range(16):
-            transaction_type = random.choice(transaction_types)
+            type = random.choice(transaction_types)
             category = random.choice(categories)
             amount = round(random.uniform(-500, 500), 2)
             balance_after_transaction = round(random.uniform(0, 5000), 2)
 
             new_transaction = TransactionHistory(
                 user_id=user_id,
-                transaction_type=transaction_type,
+                type=type,
                 amount=amount,
                 balance_after_transaction=balance_after_transaction,
                 category=category

@@ -7,8 +7,8 @@ class TransactionHistory(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    transaction_date = Column(DateTime, index=True)
-    transaction_type = Column(String, nullable=False)
+    created_at = Column(DateTime, index=True)
+    type = Column(String, nullable=False)
     amount = Column(Float, nullable=False)
     balance_after_transaction = Column(Float, nullable=True)
     category = Column(String, nullable=True)
@@ -17,9 +17,9 @@ class TransactionHistory(Base):
         return {
             "id": self.id,
             "user_id": self.user_id,
-            "transaction_date": self.transaction_date.isoformat()
-            if self.transaction_date else None,
-            "transaction_type": self.transaction_type,
+            "created_at": self.created_at.isoformat()
+            if self.created_at else None,
+            "type": self.type,
             "amount": self.amount,
             "balance_after_transaction": self.balance_after_transaction,
             "category": self.category,

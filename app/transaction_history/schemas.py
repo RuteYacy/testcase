@@ -21,8 +21,8 @@ class CategoryEnum(str, Enum):
 class TransactionHistorySchema(BaseModel):
     id: int
     user_id: int
-    transaction_date: datetime
-    transaction_type: str
+    created_at: datetime
+    type: str
     amount: float
     balance_after_transaction: Optional[float] = None
     category: CategoryEnum

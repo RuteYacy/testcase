@@ -12,14 +12,14 @@ def get_recent_transactions(user_id):
         transactions = db.query(TransactionHistory).filter(
             TransactionHistory.user_id == user_id
         ).order_by(
-            desc(TransactionHistory.transaction_date)
+            desc(TransactionHistory.created_at)
         ).limit(30).all()
 
         # Convert each transaction record to a dictionary with relevant details
         transaction_dicts = [
             {
-                "transaction_date": transaction["transaction_date"],
-                "transaction_type": transaction["transaction_type"],
+                "created_at": transaction["created_at"],
+                "type": transaction["type"],
                 "amount": transaction["amount"],
                 "balance_after_transaction": transaction["balance_after_transaction"],
                 "category": transaction["category"],

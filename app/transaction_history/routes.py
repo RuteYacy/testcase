@@ -68,9 +68,9 @@ async def get_monthly_transaction_history(
 
         transactions = db.query(TransactionHistory).filter(
             TransactionHistory.user_id == current_user.id,
-            TransactionHistory.transaction_date >= start_date,
-            TransactionHistory.transaction_date < end_date
-        ).order_by(TransactionHistory.transaction_date.desc()).all()
+            TransactionHistory.created_at >= start_date,
+            TransactionHistory.created_at < end_date
+        ).order_by(TransactionHistory.created_at.desc()).all()
 
         if not transactions:
             raise HTTPException(
