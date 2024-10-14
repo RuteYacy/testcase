@@ -10,8 +10,8 @@ class TransactionHistory(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    transaction_date = Column(DateTime, default=datetime.now, index=True)
-    transaction_type = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.now, index=True)
+    type = Column(String, nullable=False)
     amount = Column(Float, nullable=False)
     balance_after_transaction = Column(Float, nullable=True)
     category = Column(String, nullable=True)
