@@ -5,7 +5,7 @@ model = None
 
 def predict_risk_score(primary_emotion, intensity, transactions, model):
     """
-    Train the model and return the trained model.
+    Calculates the risk score and credit limit.
 
     Returns:
     - risk_score

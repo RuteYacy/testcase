@@ -32,7 +32,7 @@ class KafkaConsumerWrapper:
             logger.info("Kafka consumer waiting for messages...")
             for message in cls._consumer:
                 print(message)
-                decoded_message = message.value
+                decoded_message = json.loads(message.value)
                 await WebSocketClient.broadcast_message(decoded_message)
         except Exception as e:
             logger.error(f"Exception in consumer loop: {e}")
